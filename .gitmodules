@@ -1,0 +1,3 @@
+[submodule "colcon_ws/src/omni_wheel_controller"]
+	path = colcon_ws/src/omni_wheel_controller
+	url = https://github.com/hijimasa/omni_wheel_controller

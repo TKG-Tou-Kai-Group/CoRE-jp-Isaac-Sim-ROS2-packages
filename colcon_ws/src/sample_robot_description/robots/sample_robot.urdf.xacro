@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<robot name="sample_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:arg name="prefix" default="" />
+  <xacro:arg name="use_sim" default="false" />
+  
+  <xacro:arg name="robot_name" default="sample_robot"/>
+
+  <xacro:include filename="$(find sample_robot_description)/urdf/common.xacro"/>
+  <xacro:include filename="$(find sample_robot_description)/urdf/base/base.urdf.xacro"/>
+  <xacro:include filename="$(find sample_robot_description)/urdf/wheel/wheel_100mm_light.urdf.xacro"/>
+  <xacro:include filename="$(find sample_robot_description)/urdf/shooter/shooter.urdf.xacro"/>
+
+  <xacro:include filename="$(find sample_robot_description)/gazebo/sample_robot.gazebo.xacro"/>
+  <xacro:include filename="$(find sample_robot_description)/ros2_control/sample_robot.ros2_control.xacro"/>
+
+  <!-- =============== Link & Joint =============== -->
+  <!-- Base -->
+  <link name="base_link"/>
+  <xacro:base_v0 parent="base_link">
+	<origin xyz="0 0 0.06"/>
+  </xacro:base_v0>
+
+  <!-- Wheel -->
+  <!-- Wheel0 -->
+  <xacro:omni_wheel prefix="wheel0" parent="base_link">
+	  <origin xyz="0.35 0.35 0.05" rpy="0 ${pi/2} ${pi/4}"/>
+  </xacro:omni_wheel>
+
+  <!-- Wheel1 -->
+  <xacro:omni_wheel prefix="wheel1" parent="base_link">
+	  <origin xyz="-0.35 0.35 0.05" rpy="0 ${pi/2} ${pi*3/4}"/>
+  </xacro:omni_wheel>
+
+  <!-- Wheel3 -->
+  <xacro:omni_wheel prefix="wheel2" parent="base_link">
+	  <origin xyz="-0.35 -0.35 0.05" rpy="0 ${pi/2} ${-pi*3/4}"/>
+  </xacro:omni_wheel>
+
+  <!-- Wheel2 -->
+  <xacro:omni_wheel prefix="wheel3" parent="base_link">
+	  <origin xyz="0.35 -0.35 0.05" rpy="0 ${pi/2} ${-pi/4}"/>
+  </xacro:omni_wheel>
+
+  <xacro:shooter_v0 parent="base_link">
+	<origin xyz="0 0 0.35"/>
+  </xacro:shooter_v0>
+
+  <!-- Base -->
+  <xacro:base_gazebo_v0/>
+
+  <!-- Wheel -->
+  <!--<xacro:wheel_gazebo_v0 prefix="right"/>-->
+  <!--<xacro:wheel_gazebo_v0 prefix="left"/>-->
+  <!--xacro:wheel_gazebo_control_v0 rate="25"/-->
+
+  <joint name="camera_joint" type="fixed">
+    <parent link="base_link"/>
+    <child  link="camera_link"/>
+    <origin xyz="0.45 0 0.28" rpy="0 0 0"/>
+  </joint>
+  <link name="camera_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 -1.57 0" />
+      <geometry>
+        <cylinder radius="0.01" length="0.01" />
+      </geometry>
+      <material name="white" />
+    </visual>
+  </link>
+  
+  <xacro:sample_robot_gazebo prefix=""/>
+  <xacro:sample_robot_ros2_control name="sample_robot" use_sim="$(arg use_sim)"/>
+
+</robot>

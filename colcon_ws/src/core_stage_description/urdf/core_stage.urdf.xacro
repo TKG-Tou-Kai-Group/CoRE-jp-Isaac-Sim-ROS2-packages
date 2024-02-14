@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<robot name="core_stage" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:arg name="prefix" default="" />
+  <xacro:arg name="use_sim" default="false" />
+  
+  <xacro:arg name="robot_name" default="core_stage"/>
+
+  <!-- Base -->
+  <link name="world"/>
+
+  <joint name="marker_joint" type="fixed">
+    <parent link="world"/>
+    <child  link="stage_link"/>
+    <origin xyz="0 0 -0.015" rpy="0 0 0"/>
+  </joint>
+
+  <link name="stage_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+	      <mesh filename="file://$(find core_stage_description)/meshes/Dae/2024_CoRE_stage.dae"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+	      <mesh filename="file://$(find core_stage_description)/meshes/Dae/2024_CoRE_stage.dae"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="100000"/>
+      <inertia ixx="${100000/4}" ixy="0" ixz="0" 
+               iyy="${100000/4}" iyz="0" 
+               izz="${100000/4}"/>
+    </inertial>
+  </link>
+
+</robot>

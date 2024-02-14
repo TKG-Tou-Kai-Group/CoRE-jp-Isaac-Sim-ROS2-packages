@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">  
+
+  <xacro:macro name="omni_wheel" params="prefix parent *joint_origin">
+  <joint name="${prefix}_shaft_joint" type="continuous">
+    <parent link="${parent}"/>
+    <child  link="${prefix}_housing_link"/>
+    <xacro:insert_block name="joint_origin"/>
+    <axis xyz="0 0 1"/>
+    <dynamics damping="0.7"/>
+  </joint>
+  <transmission name="${prefix}_shaft_trans">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="${prefix}_shaft_joint">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="${prefix}_shaft_motor">
+      <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+    <link name="${prefix}_housing_link">
+      <visual>
+        <geometry>
+          <cylinder length="0.040" radius="0.05" /> 
+        </geometry>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <material name="gray"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="0.040" radius="0.05" /> 
+        </geometry>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <material name="gray"/>
+      </collision>
+
+      <inertial>
+        <mass value="1.288"/>
+        <inertia ixx="0.00235" ixy="0" ixz="0" iyy="0.00235" iyz="0" izz="0.00004"/>
+      </inertial>  
+    </link>
+    <gazebo reference="${prefix}_housing_link">
+      <material>Gazebo/Gray</material>
+      <mu1>0.8</mu1>
+      <mu2>0.05</mu2>
+      <fdir1>0 1.0 0</fdir1>
+      <kp value="30000000.0" />
+      <kd value="50000000.0" />
+    </gazebo>
+
+  </xacro:macro>
+</robot>
