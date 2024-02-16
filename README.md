@@ -1,79 +1,76 @@
-# isaac-ros2-control-sample
-- ros2_control Demo
-  ![ros2_control_demo](figs/shm_movie-2023-06-13_21.52.52.gif)
-- LiDAR output Demo
-  ![lidar_output_demo](figs/shm_movie-2023-08-05_13.14.29.gif)
-- Camera output Demo
-  ![camera_output_demo](figs/shm_movie-2023-08-11_23.57.19.gif)
+# CoREjp-Isaac-Sim-ROS2-packages
+- オムニホイールロボット操縦デモ
+  ![ros2_control_demo](figs/movie-2024-02-17_07.23.21.gif)
 
-This repository shows how to control the robot from ros2_control to make Isaac Sim easier to use.
-Important packages are "isaac_ros2_control" and "isaac_ros2_scripts". 
-"isaac_ros2_control" provide hardware_interface class and send the commands from ros2_control to "isaac_ros2_scripts".
-"isaac_ros2_scripts" is needed bacause Isaac Sim needs specific python environment.
-"isaac_ros2_scripts" has the python script to launch and control Isaac Sim.
+このリポジトリは，NvidiaのIsaac SimでROS 2で作ったロボットを開発するためのパッケージをまとめたものです．
+重要なパッケージは"isaac_ros2_utils"内に格納された"isaac_ros2_control"と"isaac_ros2_scripts"です．
+"isaac_ros2_control" は hardware_interface クラスを提供し，ros2_control からのコマンドを "isaac_ros2_scripts" に送ります．
+"isaac_ros2_scripts "にはIsaac Simを起動し制御するためのpythonスクリプトがあります．
 
-The features of this repository are below:
-- This shows how to control a robot on Isaac Sim with ros2_control.
-- This provides a Dockerfile where Isaac Sim and ROS2 Humble can coexist.
-- This currently supports only rotational joints using velocity control.
-- This sends joint status (position, velocity and effort) to ros2_control from Isaac Sim.
-- This launches sensors from URDF description.
-- This spawns URDF model at the desired timing and position.
-- This launchs sensors and controller at the desired timing.
+このリポジトリでできること
+- CoREjp2024の1部リーグ決勝トーナメント用ステージの生成
+- オムニホイールロボットの生成
+- ROS 2のteleop_twist_keyboadパッケージでの操縦
+- ROSトピックとして、ロボットに取り付けられたカメラ映像を取得
 
 ## Prerequisite
 1. Docker
-1. Isaac Sim Docker Image (Tested using image based on nvcr.io/nvidia/isaac-sim:2022.2.1)
-1. Nucleus Server (I installed with the Omniverse Laungher)
+1. Isaac SimのDockerイメージ (このリポジトリでは nvcr.io/nvidia/isaac-sim:2023.1.1 を使ってテストしています)
 
-## How to use
-1. Install Docker and pull Isaac Sim Docker Image.
-   refer to https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/install_container.html
+## 使い方
+1. Dockerをインストールして、Isaac SimのDockerイメージをプルする
+   このURLを参考にイメージをプルしてください https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/install_container.html
 
-1. Clone the repo to your ros2 workspace
+1. このリポジトリをクローンする
    ```bash
    git clone https://github.com/hijimasa/isaac-ros2-control-sample.git
    ```
 
-1. Get git submodules
+1. サブモジュール（オムニホイールコントローラ）をセットアップする
    ```bash
    cd isaac-ros2-control-sample/docker
    git submodule update --init --recursive
    ```
 
-1. Build a docker image with shell script.
+1. Dockerイメージをビルドする
    ```bash
    ./build_docker_image.sh
    ```
 
-1. Launch a docker container
+1. Dockerコンテナを立ち上げる
    ```bash
    ./launch_docker.sh
    ```
 
-1. Build ros2 source codes
+1. ROS 2のソースコードをビルドする
    ```bash
    colcon build && source install/setup.bash
    ```
 
-4. Launch the package
-   - To launch simulator
+4. パッケージを起動する
+   - シミュレータおよびステージの立ち上げ
+   
+   立ち上げたコンテナ内で以下のコマンドを実行してください
+
+   立ち上がるまでに数分かかるので、気長に待ってください
    ```bash
-   ros2 launch isaac_diffbot_sim diffbot_spawn.launch.py
+   ros2 launch sample_robot_sim bring_up_core_stage.launch.py
    ```
-   - To launch teleop_twist_keyboard
+   - ロボットの生成
+
+   シミュレータが完全に立ち上がってから（ステージが表示されてから）、別のターミナルから下記のコマンドを実行してください
+   ```bash
+   docker exec -it isaac-sim /bin/bash
+   ros2 launch sample_robot_sim bring_up_core_stage.launch.py
+   ```
+
+   - 操縦用パッケージの立ち上げ
+   
+   別のターミナルから下記のコマンドを実行してください
    ```bash
    docker exec -it isaac-sim /bin/bash
    ros2 run teleop_twist_keyboard teleop_twist_keyboard
    ```
-
-> [!NOTE]
-> For the first time, launching Isaac Sim takes a very long time.
-> Isaac Sim must be fully launched to spawn the robot.
-> So you should rerun the launch command after Isaac Sim fully launched or change WAIT_TIME in "colcon_ws/src/isaac_diffbot_sim/launch/diffbot_spawn.launch.py"
-> WAIT_TIME represents the time between the execution of the command and the spawn of the robot.
-> 
-> Remember to rebuild if you change WAIT_TIME!
 
 ## Bug
 - LaserScan topic do not published when 2D Lidar config file is used.
