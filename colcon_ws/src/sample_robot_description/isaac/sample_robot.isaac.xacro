@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="sample_robot_isaac" params="prefix">
+
+    <!-- =============== Isaac Sim =============== -->
+    <isaac>
+      <sensor name="camera_link" type="camera">
+        <topic>image_raw</topic>
+        <horizontal_fov_rad>1.3962634</horizontal_fov_rad>
+        <horizontal_focal_length>30</horizontal_focal_length> <!-- optical parameter -->
+        <vertical_focal_length>30</vertical_focal_length> <!-- optical parameter -->
+        <focus_distance>400</focus_distance> <!-- distance for clear image -->
+        <projection>perspective</projection> <!-- perspective or orthgonal -->
+        <image>
+           <width>1920</width>
+           <height>1080</height>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <update_rate>10.0</update_rate>
+      </sensor>
+    </isaac>
+
+  </xacro:macro>
+    
+</robot>

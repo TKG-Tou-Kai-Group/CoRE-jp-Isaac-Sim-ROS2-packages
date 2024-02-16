@@ -7,10 +7,10 @@
 
   <xacro:include filename="$(find sample_robot_description)/urdf/common.xacro"/>
   <xacro:include filename="$(find sample_robot_description)/urdf/base/base.urdf.xacro"/>
-  <xacro:include filename="$(find sample_robot_description)/urdf/wheel/wheel_100mm_light.urdf.xacro"/>
+  <xacro:include filename="$(find sample_robot_description)/urdf/wheel/wheel_100mm.urdf.xacro"/>
   <xacro:include filename="$(find sample_robot_description)/urdf/shooter/shooter.urdf.xacro"/>
 
-  <xacro:include filename="$(find sample_robot_description)/gazebo/sample_robot.gazebo.xacro"/>
+  <xacro:include filename="$(find sample_robot_description)/isaac/sample_robot.isaac.xacro"/>
   <xacro:include filename="$(find sample_robot_description)/ros2_control/sample_robot.ros2_control.xacro"/>
 
   <!-- =============== Link & Joint =============== -->
@@ -40,11 +40,11 @@
   <xacro:omni_wheel prefix="wheel3" parent="base_link">
 	  <origin xyz="0.35 -0.35 0.05" rpy="0 ${pi/2} ${-pi/4}"/>
   </xacro:omni_wheel>
-
+<!--
   <xacro:shooter_v0 parent="base_link">
 	<origin xyz="0 0 0.35"/>
   </xacro:shooter_v0>
-
+-->
   <!-- Base -->
   <xacro:base_gazebo_v0/>
 
@@ -59,16 +59,9 @@
     <origin xyz="0.45 0 0.28" rpy="0 0 0"/>
   </joint>
   <link name="camera_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 -1.57 0" />
-      <geometry>
-        <cylinder radius="0.01" length="0.01" />
-      </geometry>
-      <material name="white" />
-    </visual>
   </link>
-  
-  <xacro:sample_robot_gazebo prefix=""/>
+
+  <xacro:sample_robot_isaac prefix=""/>
   <xacro:sample_robot_ros2_control name="sample_robot" use_sim="$(arg use_sim)"/>
 
 </robot>
