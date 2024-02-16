@@ -13,12 +13,13 @@
 - ROS 2のteleop_twist_keyboadパッケージでの操縦
 - ROSトピックとして、ロボットに取り付けられたカメラ映像を取得
 
-## Prerequisite
+## 必要なもの
 1. Docker
 1. Isaac SimのDockerイメージ (このリポジトリでは nvcr.io/nvidia/isaac-sim:2023.1.1 を使ってテストしています)
 
 ## 使い方
 1. Dockerをインストールして、Isaac SimのDockerイメージをプルする
+
    このURLを参考にイメージをプルしてください https://docs.omniverse.nvidia.com/app_isaacsim/app_isaacsim/install_container.html
 
 1. このリポジトリをクローンする
@@ -71,9 +72,5 @@
    docker exec -it isaac-sim /bin/bash
    ros2 run teleop_twist_keyboard teleop_twist_keyboard
    ```
-
-## Bug
-- LaserScan topic do not published when 2D Lidar config file is used.
-- You should uncheck "Normarize Image" in your depth topic in RViz2 if you get black depth image.
 
 
