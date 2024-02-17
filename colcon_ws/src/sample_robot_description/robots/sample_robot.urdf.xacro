@@ -40,18 +40,13 @@
   <xacro:omni_wheel prefix="wheel3" parent="base_link">
 	  <origin xyz="0.35 -0.35 0.05" rpy="0 ${pi/2} ${-pi/4}"/>
   </xacro:omni_wheel>
-<!--
+
   <xacro:shooter_v0 parent="base_link">
-	<origin xyz="0 0 0.35"/>
+	<origin xyz="0 0 0.30"/>
   </xacro:shooter_v0>
--->
+
   <!-- Base -->
   <xacro:base_gazebo_v0/>
-
-  <!-- Wheel -->
-  <!--<xacro:wheel_gazebo_v0 prefix="right"/>-->
-  <!--<xacro:wheel_gazebo_v0 prefix="left"/>-->
-  <!--xacro:wheel_gazebo_control_v0 rate="25"/-->
 
   <joint name="camera_joint" type="fixed">
     <parent link="base_link"/>
@@ -62,6 +57,6 @@
   </link>
 
   <xacro:sample_robot_isaac prefix=""/>
-  <xacro:sample_robot_ros2_control name="sample_robot" use_sim="$(arg use_sim)"/>
+  <xacro:sample_robot_ros2_control name="$(arg robot_name)" use_sim="$(arg use_sim)"/>
 
 </robot>

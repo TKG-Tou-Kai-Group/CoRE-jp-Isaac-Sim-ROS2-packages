@@ -17,7 +17,7 @@ from launch_ros.substitutions import FindPackageShare
 
 import xacro
 
-ROBOT1_START_POSITION    = [3.0, 5.5, 1.05]
+ROBOT1_START_POSITION    = [3.0, 5.5, 0.0]
 ROBOT1_START_YAW = 0.0
 def generate_launch_description():
     # Launch Arguments
@@ -92,25 +92,45 @@ def generate_launch_description():
         parameters=[{'urdf_path': str(sample_robot_relative_urdf_path)}],
     )
 
-    flying_disc_gz_spawn_entity_list = []
-    for index in range(6):
-        disc_x = 0.2024*math.cos(-0.47473 + (index+1) * math.pi / 10)
-        disc_z = 0.2024*math.sin(-0.47473 + (index+1) * math.pi / 10)
-        flying_disc_gz_spawn_entity_list.append(
+    flying_disc_node_list = []
+    flying_disc_spawn_entity_list = []
+    for index in range(1):
+        node_name = 'spawn_disk_' + str(index)
+        flying_disc_node_list.append(
             Node(
                 package="isaac_ros2_scripts",
                 executable="spawn_robot",
+                name= node_name,
                 parameters=[{'urdf_path': str(flying_disc_relative_urdf_path),
-                            'x' : ROBOT1_START_POSITION[0]+disc_x*math.cos(ROBOT1_START_YAW),
-                            'y' : ROBOT1_START_POSITION[1]+disc_x*math.sin(ROBOT1_START_YAW),
-                            'z' : ROBOT1_START_POSITION[2] + 0.4425+disc_z,
+                            'x' : ROBOT1_START_POSITION[0],
+                            'y' : ROBOT1_START_POSITION[1],
+                            'z' : ROBOT1_START_POSITION[2] + 0.4 + 0.025 * index,
                             'R' : 0.0,
-                            'P' : -(index+1) * math.pi / 10,
+                            'P' : 0.0,
                             'Y' : ROBOT1_START_YAW,
                             }],
                 output='screen',
                 )
         )
+        if index == 0:
+            flying_disc_spawn_entity_list.append(
+                RegisterEventHandler(
+                    event_handler=OnProcessExit(
+                        target_action=isaac_prepare_robot_controller,
+                        on_exit=[flying_disc_node_list[index]],
+                    )
+                )
+            )
+        else:
+            prev_index = index - 1
+            flying_disc_spawn_entity_list.append(
+                RegisterEventHandler(
+                    event_handler=OnProcessExit(
+                        target_action=flying_disc_node_list[prev_index],
+                        on_exit=[flying_disc_node_list[index]],
+                    )
+                )
+            )
 
     robot_controllers = PathJoinSubstitution(
         [
@@ -141,17 +161,11 @@ def generate_launch_description():
         arguments=["omni_wheel_controller", "--controller-manager", "/controller_manager"],
     )
 
-    #load_joint_trajectory_controller = ExecuteProcess(
-    #    cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-    #         'joint_trajectory_controller'],
-    #    output='screen'
-    #)
-
-    #load_velocity_controller = ExecuteProcess(
-    #    cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-    #         'velocity_controller'],
-    #    output='screen'
-    #)
+    velocity_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["velocity_controller", "--controller-manager", "/controller_manager"],
+    )
 
     velocity_converter = Node(
         package='velocity_pub',
@@ -188,7 +202,8 @@ def generate_launch_description():
         control_node,
         joint_state_broadcaster_spawner,
         omni_wheel_controller_spawner,
+        velocity_controller_spawner,
         velocity_converter,
         rviz,
-    ] #+ flying_disc_gz_spawn_entity_list
+    ] + flying_disc_spawn_entity_list
     )

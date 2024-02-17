@@ -8,9 +8,6 @@ controller_manager:
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-    joint_trajectory_controller:
-      type: joint_trajectory_controller/JointTrajectoryController
-
     velocity_controller:
       type: velocity_controllers/JointGroupVelocityController
 
@@ -54,26 +51,16 @@ omni_wheel_controller:
     angular.z.min_acceleration: -0.8
     angular.z.max_jerk: 0.5
     angular.z.min_jerk: -0.5
-
-joint_trajectory_controller:
-  ros__parameters:
-    joints:
-      - shooter_shaft_link_joint
-      - shooter_mag_link_joint
-    command_interfaces:
-      - position
-    state_interfaces:
-      - position
-      - velocity
       
 velocity_controller:
   ros__parameters:
     joints:
-      - shooter_wheel_link_joint
+      - shooter_wheel1_link_joint
       - shooter_wheel2_link_joint
-      - shooter_wheel3_link_joint
+      - shooter_loader_link_joint
     command_interfaces:
       - velocity
     state_interfaces:
       - position
       - velocity
+      - effort
