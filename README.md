@@ -2,6 +2,9 @@
 - オムニホイールロボット操縦デモ
   ![ros2_control_demo](figs/movie-2024-02-17_07.23.21.gif)
 
+- 全方向移動およびディスク射出デモ
+  ![ros2_control_demo](figs/movie-2024-02-17_17.34.55.gif)
+
 このリポジトリは，NvidiaのIsaac SimでROS 2で作ったロボットを開発するためのパッケージをまとめたものです．
 重要なパッケージは"isaac_ros2_utils"内に格納された"isaac_ros2_control"と"isaac_ros2_scripts"です．
 "isaac_ros2_control" は hardware_interface クラスを提供し，ros2_control からのコマンドを "isaac_ros2_scripts" に送ります．
@@ -71,6 +74,11 @@
    ```bash
    docker exec -it isaac-sim /bin/bash
    ros2 run teleop_twist_keyboard teleop_twist_keyboard
+   ```
+   射出用コマンド
+   ```bash
+   docker exec -it isaac-sim /bin/bash
+   ros2 topic pub /velocity_controller/commands std_msgs/msg/Float64MultiArray "data: [400, 400, 1]"
    ```
 
 
