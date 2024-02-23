@@ -94,7 +94,7 @@ def generate_launch_description():
 
     flying_disc_node_list = []
     flying_disc_spawn_entity_list = []
-    for index in range(1):
+    for index in range(10):
         node_name = 'spawn_disk_' + str(index)
         flying_disc_node_list.append(
             Node(

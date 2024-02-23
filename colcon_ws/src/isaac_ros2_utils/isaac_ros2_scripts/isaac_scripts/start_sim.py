@@ -38,7 +38,10 @@ def main():
     physxSceneAPI.CreateEnableStabilizationAttr(True)
     physxSceneAPI.CreateEnableGPUDynamicsAttr(False)
     physxSceneAPI.CreateBroadphaseTypeAttr("MBP")
-    physxSceneAPI.CreateSolverTypeAttr("TGS")
+    # Refer to https://forums.developer.nvidia.com/t/wheeled-robot-incorrect-behavior/245133
+    #physxSceneAPI.CreateSolverTypeAttr("TGS")
+    physxSceneAPI.CreateSolverTypeAttr("PGS")
+    physxSceneAPI.CreateTimeStepsPerSecondAttr(600)
 
     simulation_context = SimulationContext(physics_dt=1.0 / Frame_per_Second, rendering_dt=1.0 / Frame_per_Second, stage_units_in_meters=1.0)
 
