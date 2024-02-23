@@ -71,6 +71,8 @@ def main(urdf_path:str):
             if child.attrib["name"] == joint.attrib["name"]:
                 if child.attrib["type"] == "continuous":
                     joint_type.append("angular")
+                elif child.attrib["type"] == "prismatic":
+                    joint_type.append("linear")
                 else:
                     joint_type.append(child.attrib["type"])
                 break
