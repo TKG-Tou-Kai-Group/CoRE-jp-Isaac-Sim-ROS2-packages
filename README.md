@@ -81,7 +81,8 @@
    射出用コマンド
    ```bash
    docker exec -it isaac-sim /bin/bash
-   ros2 topic pub /velocity_controller/commands std_msgs/msg/Float64MultiArray "data: [400, 400, 1]"
+   ros2 topic pub /velocity_controller/commands std_msgs/msg/Float64MultiArray "data: [400, 400, 1]" # 発射
+   ros2 topic pub /velocity_controller/commands std_msgs/msg/Float64MultiArray "data: [400, 400, -1]" # リロード
    ```
 
 
