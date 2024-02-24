@@ -1,3 +1,6 @@
 [submodule "colcon_ws/src/omni_wheel_controller"]
 	path = colcon_ws/src/omni_wheel_controller
 	url = https://github.com/hijimasa/omni_wheel_controller
+[submodule "colcon_ws/src/isaac_ros2_utils"]
+	path = colcon_ws/src/isaac_ros2_utils
+	url = https://github.com/hijimasa/isaac_ros2_utils.git
