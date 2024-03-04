@@ -183,7 +183,21 @@ def generate_launch_description():
         output="log",
         arguments=["-d", rviz_config_file],
     )
-    
+
+    teleop_twist_joy = IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([os.path.join(
+                get_package_share_directory('teleop_twist_joy_for_sample_robot'), 'launch'), '/teleop-launch.py']),
+         )
+
+    core_jp_camera_viewer = Node(
+        package='core_jp_camera_viewer',
+        name='viewer',
+        executable='viewer',
+        remappings=[
+            ('/image', '/World/sample_robot/camera_link/image_raw'),
+        ],
+    )
+
     return LaunchDescription([
         RegisterEventHandler(
             event_handler=OnProcessExit(
@@ -204,6 +218,8 @@ def generate_launch_description():
         omni_wheel_controller_spawner,
         velocity_controller_spawner,
         velocity_converter,
-        rviz,
+        #rviz,
+        teleop_twist_joy,
+        core_jp_camera_viewer,
     ] + flying_disc_spawn_entity_list
     )
