@@ -71,18 +71,13 @@
    ```
    ディスクが一通り生成し終わったら、シミュレータ左の三角ボタンでシミュレーションを開始してください
 
-   - 操縦用パッケージの立ち上げ
+   - 操作方法
    
-   別のターミナルから下記のコマンドを実行してください
-   ```bash
-   docker exec -it isaac-sim /bin/bash
-   ros2 run teleop_twist_keyboard teleop_twist_keyboard
-   ```
-   射出用コマンド
-   ```bash
-   docker exec -it isaac-sim /bin/bash
-   ros2 topic pub /velocity_controller/commands std_msgs/msg/Float64MultiArray "data: [400, 400, 1]" # 発射
-   ros2 topic pub /velocity_controller/commands std_msgs/msg/Float64MultiArray "data: [400, 400, -1]" # リロード
-   ```
-
-
+   基本はteleop_twist_joyのps3-holonomic.config.yamlを使用しています。
+   
+   PSコントローラだと、
+   
+   - Rボタン: イネーブルボタン（押さないとロボットが移動しない）
+   - 左スティック：ロボットの前後左右移動
+   - 右スティック左右：ロボットの回転
+   - 丸ボタン：ディスク射出（単発）
