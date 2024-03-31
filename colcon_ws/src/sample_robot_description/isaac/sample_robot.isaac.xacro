@@ -22,6 +22,9 @@
         </clip>
         <update_rate>10.0</update_rate>
       </sensor>
+      <sensor name="base_frame_link" type="contact">
+        <topic>contact</topic>
+      </sensor>
     </isaac>
 
   </xacro:macro>
