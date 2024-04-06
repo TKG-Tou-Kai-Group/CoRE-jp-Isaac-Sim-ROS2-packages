@@ -20,7 +20,10 @@ def generate_launch_description():
     isaac_launcher = Node(
         package="isaac_ros2_scripts",
         executable="launcher",
-        parameters=[{'usd_path': str(core_stage_usd_path)}],
+        parameters=[{'usd_path': str(core_stage_usd_path),
+                     'fps': 15.0,
+                     'time_steps_per_second': 120.0,
+                     }],
     )
     
     return LaunchDescription([
