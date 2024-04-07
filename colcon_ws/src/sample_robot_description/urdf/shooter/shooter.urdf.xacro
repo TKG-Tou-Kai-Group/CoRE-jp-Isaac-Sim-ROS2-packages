@@ -10,14 +10,43 @@
 
         <link name="shooter_base_link">
           <visual>
+                <origin xyz="0.05 0.0 0.0"/>
                 <geometry>
-                  <box size="0.2 0.18 0.08" />
+                  <box size="0.3 0.18 0.08" />
+                </geometry>
+                <material name="gray"/>
+          </visual>
+          <collision>
+                <origin xyz="0.05 0.0 0.0"/>
+                <geometry>
+                  <box size="0.3 0.18 0.08" />
+                </geometry>
+          </collision>
+          <inertial>
+                <origin xyz="0 0 0"/>
+                <mass value="1.0"/>
+                <inertia ixx="0.1" ixy="0" ixz="0"
+                                 iyy="0.1" iyz="0"
+                                 izz="0.1" />
+          </inertial>
+        </link>
+
+        <joint name="shooter_barel_link_joint" type="fixed">
+          <origin rpy="0 0 0" xyz="0.15 0.0 0.09"/>
+          <parent link="shooter_base_link"/>
+          <child link="shooter_barel_link"/>
+        </joint>
+
+        <link name="shooter_barel_link">
+          <visual>
+                <geometry>
+                  <box size="0.1 0.18 0.04" />
                 </geometry>
                 <material name="gray"/>
           </visual>
           <collision>
                 <geometry>
-                  <box size="0.2 0.18 0.08" />
+                  <box size="0.1 0.18 0.04" />
                 </geometry>
           </collision>
           <inertial>
@@ -82,7 +111,61 @@
                                  izz="0.1" />
           </inertial>
         </link>
-                
+
+        <joint name="shooter_wall3_link_joint" type="fixed">
+          <origin rpy="0 0 0" xyz="0.25 0.12 0.05"/>
+          <parent link="shooter_base_link"/>
+          <child link="shooter_wall3_link"/>
+        </joint>
+
+        <link name="shooter_wall3_link">
+          <visual>
+                <geometry>
+                  <box size="0.1 0.02 0.08" />
+                </geometry>
+                <material name="gray"/>
+          </visual>
+          <collision>
+                <geometry>
+                  <box size="0.1 0.02 0.08" />
+                </geometry>
+          </collision>
+          <inertial>
+                <origin xyz="0 0 0"/>
+                <mass value="1.0"/>
+                <inertia ixx="0.1" ixy="0" ixz="0"
+                                 iyy="0.1" iyz="0"
+                                 izz="0.1" />
+          </inertial>
+        </link>
+
+        <joint name="shooter_wall4_link_joint" type="fixed">
+          <origin rpy="0 0 0" xyz="0.25 -0.12 0.05"/>
+          <parent link="shooter_base_link"/>
+          <child link="shooter_wall4_link"/>
+        </joint>
+
+        <link name="shooter_wall4_link">
+          <visual>
+                <geometry>
+                  <box size="0.1 0.02 0.08" />
+                </geometry>
+                <material name="gray"/>
+          </visual>
+          <collision>
+                <geometry>
+                  <box size="0.1 0.02 0.08" />
+                </geometry>
+          </collision>
+          <inertial>
+                <origin xyz="0 0 0"/>
+                <mass value="1.0"/>
+                <inertia ixx="0.1" ixy="0" ixz="0"
+                                 iyy="0.1" iyz="0"
+                                 izz="0.1" />
+          </inertial>
+        </link>
+                        
         <joint name="shooter_pole1_link_joint" type="fixed">
           <origin rpy="0 0 0" xyz="0.07778 0.07778 0.315"/> <!-- disc pos x 0.18 z -0.0925 -->
           <parent link="shooter_base_link"/>
@@ -196,7 +279,7 @@
         </link>
 
         <joint name="shooter_pole5_link_joint" type="fixed">
-          <origin rpy="0 0 0" xyz="0.11 0.0 0.365"/> <!-- disc pos x 0.18 z -0.0925 -->
+          <origin rpy="0 0 0" xyz="0.11 0.0 0.34"/> <!-- disc pos x 0.18 z -0.0925 -->
           <parent link="shooter_base_link"/>
           <child link="shooter_pole5_link"/>
           <axis xyz="0 0 1"/>
@@ -205,13 +288,13 @@
         <link name="shooter_pole5_link">
           <visual>
                 <geometry>
-                  <cylinder length="0.4" radius="0.01" />
+                  <cylinder length="0.45" radius="0.01" />
                 </geometry>
                 <material name="gray"/>
           </visual>
           <collision>
                 <geometry>
-                  <cylinder length="0.4" radius="0.01" />
+                  <cylinder length="0.45" radius="0.01" />
                 </geometry>
           </collision>
           <inertial>
@@ -340,7 +423,7 @@
 
 
          <joint name="shooter_wheel1_link_joint" type="continuous">
-          <origin rpy="${-pi/2} 0 0" xyz="0.15 0 0.015"/> <!-- disc pos x 0.18 z -0.0925 -->
+          <origin rpy="0 0 0" xyz="0.15 0.13 0.055"/> <!-- disc pos x 0.18 z -0.0925 -->
           <parent link="shooter_base_link"/>
           <child link="shooter_wheel1_link"/>
           <axis xyz="0 0 1"/>
@@ -349,26 +432,26 @@
         <link name="shooter_wheel1_link">
           <visual>
                 <geometry>
-                  <cylinder length="0.18" radius="0.04" />
+                  <cylinder length="0.02" radius="0.04" />
                 </geometry>
                 <material name="gray"/>
           </visual>
           <collision>
                 <geometry>
-                  <cylinder length="0.18" radius="0.04" />
+                  <cylinder length="0.02" radius="0.04" />
                 </geometry>
           </collision>
           <inertial>
                 <origin xyz="0 0 0"/>
-                <mass value="1.0"/>
-                <inertia ixx="0.1" ixy="0" ixz="0"
-                                 iyy="0.1" iyz="0"
-                                 izz="0.1" />
+                <mass value="10.0"/>
+                <inertia ixx="1" ixy="0" ixz="0"
+                                 iyy="1" iyz="0"
+                                 izz="1" />
           </inertial>
         </link>
 
          <joint name="shooter_wheel2_link_joint" type="continuous">
-          <origin rpy="${-pi/2} 0 0" xyz="0.15 0 0.105"/> <!-- disc pos x 0.18 z -0.0925 -->
+          <origin rpy="0 0 0" xyz="0.15 -0.13 0.055"/> <!-- disc pos x 0.18 z -0.0925 -->
           <parent link="shooter_base_link"/>
           <child link="shooter_wheel2_link"/>
           <axis xyz="0 0 -1"/>
@@ -377,21 +460,21 @@
         <link name="shooter_wheel2_link">
           <visual>
                 <geometry>
-                  <cylinder length="0.18" radius="0.04" />
+                  <cylinder length="0.02" radius="0.04" />
                 </geometry>
                 <material name="gray"/>
           </visual>
           <collision>
                 <geometry>
-                  <cylinder length="0.18" radius="0.04" />
+                  <cylinder length="0.02" radius="0.04" />
                 </geometry>
           </collision>
           <inertial>
                 <origin xyz="0 0 0"/>
-                <mass value="1.0"/>
-                <inertia ixx="0.1" ixy="0" ixz="0"
-                                 iyy="0.1" iyz="0"
-                                 izz="0.1" />
+                <mass value="10.0"/>
+                <inertia ixx="1" ixy="0" ixz="0"
+                                 iyy="1" iyz="0"
+                                 izz="1" />
           </inertial>
         </link>
 

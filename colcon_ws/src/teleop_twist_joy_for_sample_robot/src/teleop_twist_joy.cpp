@@ -386,11 +386,11 @@ namespace teleop_twist_joy_for_sample_robot
 
     if (joy_msg->buttons[shoot_button])
     {
-      sendCmdShootMsg(300, 1);
+      sendCmdShootMsg(800, 1);
     }
     else
     {
-      sendCmdShootMsg(300, -1);
+      sendCmdShootMsg(800, -1);
     }
   }
 
