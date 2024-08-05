@@ -7,9 +7,9 @@ import launch_ros.actions
 import xacro
 from launch_ros.substitutions import FindPackageShare
 
-share_dir_path = os.path.join(get_package_share_directory('marker_plate_description'))
-xacro_path = os.path.join(share_dir_path, 'urdf', 'marker_plate.urdf.xacro')
-urdf_path = os.path.join(share_dir_path, 'urdf', 'marker_plate_step2.urdf')
+share_dir_path = os.path.join(get_package_share_directory('core_stage_description'))
+xacro_path = os.path.join(share_dir_path, 'urdf', 'core_stage.urdf.xacro')
+urdf_path = os.path.join(share_dir_path, 'urdf', 'core_stage.urdf')
 rviz_config_file = os.path.join(share_dir_path, 'config', 'marker_plate.rviz')
 
 def generate_launch_description():

@@ -11,7 +11,10 @@
           <param name="state_following_offset">0.0</param>
         </xacro:if>
         <xacro:if value="${use_sim}">
-          <plugin>isaac_ros2_control/IsaacSystem</plugin>
+          <plugin>topic_based_ros2_control/TopicBasedSystem</plugin>
+          <param name="joint_commands_topic">/${name}/joint_command</param>
+          <param name="joint_states_topic">/${name}/joint_states</param>
+          <param name="sum_wrapped_joint_states">true</param>
         </xacro:if>
       </hardware>
       <joint name="wheel0_shaft_joint">
@@ -61,7 +64,7 @@
       <joint name="shooter_wheel1_link_joint">
         <command_interface name="velocity">
           <param name="min">0</param>
-          <param name="max">800</param>
+          <param name="max">1600</param>
         </command_interface>
         <state_interface name="position">
           <param name="initial_value">0.0</param>
@@ -72,7 +75,7 @@
       <joint name="shooter_wheel2_link_joint">
         <command_interface name="velocity">
           <param name="min">0</param>
-          <param name="max">800</param>
+          <param name="max">1600</param>
         </command_interface>
         <state_interface name="position">
           <param name="initial_value">0.0</param>

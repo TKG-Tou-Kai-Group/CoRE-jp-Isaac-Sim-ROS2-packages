@@ -35,12 +35,5 @@
                izz="0.000030"/>
     </inertial>
   </link>
-
-  <gazebo reference="disc_link">
-    <material>Gazebo/White</material>
-    <selfCollide>true</selfCollide>
-    <mu1 value="0.5" />
-    <mu2 value="0.5" />
-  </gazebo>
   
 </robot>
