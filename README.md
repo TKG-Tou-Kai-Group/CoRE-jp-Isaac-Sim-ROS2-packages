@@ -3,8 +3,8 @@
   ![ros2_control_demo](figs/CoREjp_robot_test3.gif)
 
 このリポジトリは，NvidiaのIsaac SimでROS 2で作ったロボットを開発するためのパッケージをまとめたものです．
-重要なパッケージは"isaac_ros2_utils"内に格納された"isaac_ros2_control"と"isaac_ros2_scripts"です．
-"isaac_ros2_control" は hardware_interface クラスを提供し，ros2_control からのコマンドを "isaac_ros2_scripts" に送ります．
+重要なパッケージは"isaac_ros2_utils"内に格納された"topic_based_ros2_control"と"isaac_ros2_scripts"です．
+"topic_based_ros2_control" は hardware_interface クラスを提供し，ros2_control からのコマンドを "isaac_ros2_scripts" に送ります．
 "isaac_ros2_scripts "にはIsaac Simを起動し制御するためのpythonスクリプトがあります．
 
 このリポジトリでできること
@@ -15,7 +15,7 @@
 
 ## 必要なもの
 1. Docker
-1. Isaac SimのDockerイメージ (このリポジトリでは nvcr.io/nvidia/isaac-sim:2023.1.1 を使ってテストしています)
+1. Isaac SimのDockerイメージ (このリポジトリでは nvcr.io/nvidia/isaac-sim:4.1.0 を使ってテストしています)
 
 ## 使い方
 1. Dockerをインストールして、Isaac SimのDockerイメージをプルする
@@ -45,7 +45,7 @@
 
 1. ROS 2のソースコードをビルドする
    ```bash
-   colcon build && source install/setup.bash
+   colcon build && source install/setup.sh
    ```
 
 4. パッケージを起動する
