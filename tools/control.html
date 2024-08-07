@@ -28,6 +28,14 @@
     // When the Rosbridge server connects, fill the span with id "status" with "successful"
     ros.on("connection", () => {
       document.getElementById("status").innerHTML = "successful";
+
+      const canvas = document.getElementById('imageCanvas');
+      // 画像の実際のサイズを設定
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      canvas.width = width;
+      canvas.height = height;
+
       console.log('Connected to ROSBridge WebSocket server.');
     });
 
