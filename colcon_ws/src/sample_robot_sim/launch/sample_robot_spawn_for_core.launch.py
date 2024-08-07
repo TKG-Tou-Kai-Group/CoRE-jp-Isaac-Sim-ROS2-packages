@@ -230,7 +230,7 @@ def generate_launch_description():
         velocity_controller_spawner,
         velocity_converter,
         #rviz,
-        #teleop_twist_joy,
+        teleop_twist_joy,
         #core_jp_camera_viewer,
         image_compressor,
     ] + flying_disc_spawn_entity_list

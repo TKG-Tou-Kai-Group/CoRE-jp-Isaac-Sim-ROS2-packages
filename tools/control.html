@@ -8,12 +8,15 @@
 </head>
 
 <body>
-  <p><img id="image_sub"/></p>
+  <canvas id="imageCanvas" style="width: 100%; height: 100%;"></canvas>
   <hr/>
 
   <p>Connection: <span id="status" style="font-weight: bold;">N/A</span></p>
 
   <script>
+    // ロボット名を設定
+    const ROBOT_NAME = 'my_robot'; // ここでロボット名を指定します
+
     // Create ros object to communicate over your Rosbridge connection
     const ros = new ROSLIB.Ros({
       url: 'ws://localhost:9090',
@@ -45,79 +48,53 @@
     });
 
     image.subscribe(function(message) {
-      console.log('Received image');
-      var data = "data:image/png;base64," + message.data;
-      document.getElementById('image_sub').setAttribute('src', data); 
+      const canvas = document.getElementById('imageCanvas');
+      const context = canvas.getContext('2d');
+      const img = new Image();
+      img.src = 'data:image/jpeg;base64,' + message.data;
+      img.onload = () => {
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
     });
     
-    const cmdVel = new ROSLIB.Topic({
+    // Joyメッセージをパブリッシュするためのトピックを作成
+    const joyTopic = new ROSLIB.Topic({
       ros: ros,
-      name: '/cmd_vel',
-      messageType: 'geometry_msgs/Twist'
+      name: '/joy',
+      messageType: 'sensor_msgs/Joy'
     });
 
-    const pad = document.getElementById('pad');
-    const handle = document.getElementById('handle');
+    // ゲームパッドの状態を更新し、ROSにパブリッシュ
+    function updateGamepadStatus() {
+      const gamepads = navigator.getGamepads();
+      for (let i = 0; i < gamepads.length; i++) {
+        const gp = gamepads[i];
+        if (gp) {
+          // スティックの値を修正
+          const axes = gp.axes.map(axis => Math.abs(axis) <= 0.3 ? 0 : axis);
 
-    let twist = new ROSLIB.Message({
-      linear: { x: 0, y: 0, z: 0 },
-      angular: { x: 0, y: 0, z: 0 }
-    });
+          // Joyメッセージを作成
+          const joyMessage = new ROSLIB.Message({
+            header: {
+              stamp: {
+                secs: Math.floor(Date.now() / 1000),
+                nsecs: (Date.now() % 1000) * 1000000
+              },
+              frame_id: ''
+            },
+            axes: axes,
+            buttons: gp.buttons.map(button => button.value)
+          });
 
-    let start;
-    let a;
-    let b;
-
-    const buttonPressed = (button) => {
-      if (typeof button == "object") {
-        return button.pressed;
+          // Joyメッセージをパブリッシュ
+          joyTopic.publish(joyMessage);
+        }
       }
-      return button == 1.0;
-    };
-
-    const gameLoop = () => {
-      const gamepads = navigator.getGamepads
-        ? navigator.getGamepads()
-        : navigator.webkitGetGamepads
-        ? navigator.webkitGetGamepads
-        : [];
-      if (!gamepads) {
-        return;
-      }
-  
-      const gp = gamepads[0];
-      if (buttonPressed(gp.buttons[3])) {
-        console.log('b--.');
-        b--;
-      } else if (buttonPressed(gp.buttons[0])) {
-        console.log('b++.');
-        b++;
-      }
-      if (buttonPressed(gp.buttons[1])) {
-        a++;
-      } else if (buttonPressed(gp.buttons[2])) {
-        a--;
-      }
-
-      console.log('processing.');
-      const speed = 0.5;
-      const leftStickX = gp.axes[0].toFixed(2);
-      const leftStickY = gp.axes[1].toFixed(2);
-      const rightStickX = gp.axes[2].toFixed(2);
-      const rightStickY = gp.axes[3].toFixed(2);
-      let nx = (speed * leftStickX);
-      let ny = (speed * leftStickY);
-      let nz = (speed * rightStickX);
-      twist.linear.x = -parseFloat(ny.toFixed(3));
-      twist.linear.y = -parseFloat(nx.toFixed(3));
-      twist.angular.z = -parseFloat(nz.toFixed(3));
-      cmdVel.publish(twist);
-
-      start = requestAnimationFrame(gameLoop);
-    };
+      requestAnimationFrame(updateGamepadStatus);
+    }
 
     window.addEventListener("gamepadconnected", (e) => {
-      gameLoop();
+      updateGamepadStatus();
     });
 </script>
 

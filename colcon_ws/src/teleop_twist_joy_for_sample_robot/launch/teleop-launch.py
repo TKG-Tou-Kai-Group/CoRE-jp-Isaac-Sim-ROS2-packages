@@ -20,13 +20,13 @@ def generate_launch_description():
                 get_package_share_directory('teleop_twist_joy_for_sample_robot'), 'config', '')),
             joy_config, launch.substitutions.TextSubstitution(text='.config.yaml')]),
 
-        launch_ros.actions.Node(
-            package='joy', executable='joy_node', name='joy_node',
-            parameters=[{
-                'dev': joy_dev,
-                'deadzone': 0.3,
-                'autorepeat_rate': 20.0,
-            }]),
+        #launch_ros.actions.Node(
+        #    package='joy', executable='joy_node', name='joy_node',
+        #    parameters=[{
+        #        'dev': joy_dev,
+        #        'deadzone': 0.3,
+        #        'autorepeat_rate': 20.0,
+        #    }]),
         launch_ros.actions.Node(
             package='teleop_twist_joy_for_sample_robot', executable='teleop_node',
             name='teleop_twist_joy_node', parameters=[config_filepath],
