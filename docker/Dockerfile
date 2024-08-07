@@ -38,7 +38,7 @@ RUN apt -y -qq update && apt -y -qq install software-properties-common mesa-util
     ros-humble-pluginlib ros-humble-urdf ros-humble-yaml-cpp-vendor ros-humble-joint-state-pub* \
     ros-humble-cv-bridge ros-humble-diagnostic-updater && \
   apt-get install -y -qq ros-humble-xacro ros-humble-realtime-tools ros-humble-control-toolbox ros-humble-ros2-control* \
-    ros-humble-teleop-twist-keyboard ros-humble-vision-msgs && \
+    ros-humble-teleop-twist-keyboard ros-humble-vision-msgs ros-humble-rosbridge-suite && \
   : "remove cache" && \
   apt-get autoremove -y -qq && \
   rm -rf /var/lib/apt/lists/*
@@ -49,6 +49,7 @@ RUN apt-get update && apt-get install -q -y --no-install-recommends \
     lsb-release \
     python3-colcon-ros \
     telnet \
+    nodejs \
     && apt-get clean
 
 RUN echo 'source /opt/ros/humble/setup.bash' >> ~/.bashrc

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<!-- <script src="https://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script> -->
+<!-- <script type="text/javascript" src="roslib.min.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/roslibjs/0.20.0/roslib.min.js"></script>
+</head>
+
+<body>
+  <p><img id="image_sub"/></p>
+  <hr/>
+
+  <p>Connection: <span id="status" style="font-weight: bold;">N/A</span></p>
+
+  <script>
+    // Create ros object to communicate over your Rosbridge connection
+    const ros = new ROSLIB.Ros({
+      url: 'ws://localhost:9090',
+      options: {
+        ros_domain_id: '89' // ROS_DOMAIN_IDを設定する
+      }
+    });
+
+    // When the Rosbridge server connects, fill the span with id "status" with "successful"
+    ros.on("connection", () => {
+      document.getElementById("status").innerHTML = "successful";
+      console.log('Connected to ROSBridge WebSocket server.');
+    });
+
+    // When the Rosbridge server experiences an error, fill the "status" span with the returned error
+    ros.on('error', function(error) {
+      console.log('Error connecting to ROSBridge WebSocket server: ', error);
+    });
+
+    // When the Rosbridge server shuts down, fill the "status" span with "closed"
+    ros.on('close', function() {
+      console.log('Connection to ROSBridge WebSocket server closed.');
+    });
+
+    var image = new ROSLIB.Topic({
+      ros : ros,
+      name : '/World/sample_robot/camera_link/image_compressed',
+      messageType : 'sensor_msgs/CompressedImage'
+    });
+
+    image.subscribe(function(message) {
+      console.log('Received image');
+      var data = "data:image/png;base64," + message.data;
+      document.getElementById('image_sub').setAttribute('src', data); 
+    });
+    
+    const cmdVel = new ROSLIB.Topic({
+      ros: ros,
+      name: '/cmd_vel',
+      messageType: 'geometry_msgs/Twist'
+    });
+
+    const pad = document.getElementById('pad');
+    const handle = document.getElementById('handle');
+
+    let twist = new ROSLIB.Message({
+      linear: { x: 0, y: 0, z: 0 },
+      angular: { x: 0, y: 0, z: 0 }
+    });
+
+    let start;
+    let a;
+    let b;
+
+    const buttonPressed = (button) => {
+      if (typeof button == "object") {
+        return button.pressed;
+      }
+      return button == 1.0;
+    };
+
+    const gameLoop = () => {
+      const gamepads = navigator.getGamepads
+        ? navigator.getGamepads()
+        : navigator.webkitGetGamepads
+        ? navigator.webkitGetGamepads
+        : [];
+      if (!gamepads) {
+        return;
+      }
+  
+      const gp = gamepads[0];
+      if (buttonPressed(gp.buttons[3])) {
+        console.log('b--.');
+        b--;
+      } else if (buttonPressed(gp.buttons[0])) {
+        console.log('b++.');
+        b++;
+      }
+      if (buttonPressed(gp.buttons[1])) {
+        a++;
+      } else if (buttonPressed(gp.buttons[2])) {
+        a--;
+      }
+
+      console.log('processing.');
+      const speed = 0.5;
+      const leftStickX = gp.axes[0].toFixed(2);
+      const leftStickY = gp.axes[1].toFixed(2);
+      const rightStickX = gp.axes[2].toFixed(2);
+      const rightStickY = gp.axes[3].toFixed(2);
+      let nx = (speed * leftStickX);
+      let ny = (speed * leftStickY);
+      let nz = (speed * rightStickX);
+      twist.linear.x = -parseFloat(ny.toFixed(3));
+      twist.linear.y = -parseFloat(nx.toFixed(3));
+      twist.angular.z = -parseFloat(nz.toFixed(3));
+      cmdVel.publish(twist);
+
+      start = requestAnimationFrame(gameLoop);
+    };
+
+    window.addEventListener("gamepadconnected", (e) => {
+      gameLoop();
+    });
+</script>
+
+</body>
+</html>
+

@@ -10,6 +10,7 @@ from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchD
 from launch.actions import RegisterEventHandler
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.launch_description_sources import AnyLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 
 from launch_ros.actions import Node
@@ -198,6 +199,16 @@ def generate_launch_description():
         ],
     )
 
+    image_compressor = Node(
+        package='image_compressor',
+        name='compressor_node',
+        executable='compressor_node',
+        remappings=[
+            ('input_image_topic', '/World/sample_robot/camera_link/image_raw'),
+            ('compressed_image_topic', '/World/sample_robot/camera_link/image_compressed')
+        ],
+    )
+
     return LaunchDescription([
         RegisterEventHandler(
             event_handler=OnProcessExit(
@@ -219,7 +230,8 @@ def generate_launch_description():
         velocity_controller_spawner,
         velocity_converter,
         #rviz,
-        teleop_twist_joy,
-        core_jp_camera_viewer,
+        #teleop_twist_joy,
+        #core_jp_camera_viewer,
+        image_compressor,
     ] + flying_disc_spawn_entity_list
     )
