@@ -190,12 +190,13 @@ def generate_launch_description():
                 get_package_share_directory('teleop_twist_joy_for_sample_robot'), 'launch'), '/teleop-launch.py']),
          )
 
-    core_jp_camera_viewer = Node(
-        package='core_jp_camera_viewer',
-        name='viewer',
-        executable='viewer',
+    core_jp_camera_publisher = Node(
+        package='core_jp_camera_publisher',
+        name='publisher_node',
+        executable='publisher_node',
         remappings=[
-            ('/image', '/World/sample_robot/camera_link/image_raw'),
+            ('input_image_topic', '/World/sample_robot/camera_link/image_raw'),
+            ('output_image_topic',  '/World/sample_robot/camera_link/image_compressed')
         ],
     )
 
@@ -231,7 +232,7 @@ def generate_launch_description():
         velocity_converter,
         #rviz,
         teleop_twist_joy,
-        #core_jp_camera_viewer,
-        image_compressor,
+        core_jp_camera_publisher,
+        #image_compressor,
     ] + flying_disc_spawn_entity_list
     )
