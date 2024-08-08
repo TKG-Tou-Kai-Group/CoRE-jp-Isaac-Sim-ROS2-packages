@@ -223,6 +223,23 @@ def generate_launch_description():
             ('output_image_topic',  '/World/' + ROBOT_NAME + '/camera_link/image_compressed')
         ],
     )
+    
+    hp_manager = Node(
+        package='hp_manager',
+        name='manager_node',
+        executable='manager_node',
+        namespace=ROBOT_NAME,
+        remappings=[
+            ('armor_topic_1', '/World/' + ROBOT_NAME + '/armor1_link/contact'),
+            ('armor_topic_2', '/World/' + ROBOT_NAME + '/armor2_link/contact'),
+            ('armor_topic_3', '/World/' + ROBOT_NAME + '/armor3_link/contact'),
+            ('armor_topic_4', '/World/' + ROBOT_NAME + '/armor4_link/contact'),
+        ],
+        parameters=[
+            ('initial_hp', '100'),
+            ('respawn_time_sec', '5.0'),
+        ],
+    )
 
     return LaunchDescription([
         RegisterEventHandler(
@@ -247,5 +264,6 @@ def generate_launch_description():
         #rviz,
         teleop_twist_joy,
         core_jp_camera_publisher,
+        hp_manager,
     ] + flying_disc_spawn_entity_list
     )
