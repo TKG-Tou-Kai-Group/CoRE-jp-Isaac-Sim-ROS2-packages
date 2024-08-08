@@ -19,8 +19,8 @@ from launch_ros.substitutions import FindPackageShare
 import launch
 import xacro
 
-ROBOT_NAME = 'sample_robot'
-ROBOT_START_POSITION    = [-4.5, 8.5, 0.0]
+ROBOT_NAME = 'sample_robot_2'
+ROBOT_START_POSITION    = [-4.5, 10.5, 0.0]
 ROBOT_START_YAW = 0.0
 
 def generate_launch_description():
