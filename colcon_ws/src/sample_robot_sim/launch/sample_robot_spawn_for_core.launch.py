@@ -220,13 +220,23 @@ def generate_launch_description():
         namespace=ROBOT_NAME,
         remappings=[
             ('input_image_topic', '/World/' + ROBOT_NAME + '/camera_link/image_raw'),
-            ('output_image_topic',  '/World/' + ROBOT_NAME + '/camera_link/image_compressed')
+            ('output_image_topic',  '/World/' + ROBOT_NAME + '/camera_link/image_compressed'),
+            ('game_status', '/game_status'),
+            ('countdown', '/countdown'),
+            ('robot1_hp',  '/' + "sample_robot_1" + '/robot_hp'),
+            ('robot2_hp',  '/' + "sample_robot_2" + '/robot_hp'),
+            ('robot3_hp',  '/' + "sample_robot_3" + '/robot_hp'),
+            ('robot4_hp',  '/' + "sample_robot_4" + '/robot_hp'),
+            ('robot5_hp',  '/' + "sample_robot_5" + '/robot_hp'),
+            ('robot6_hp',  '/' + "sample_robot_6" + '/robot_hp'),
+            ('robot7_hp',  '/' + "sample_robot_7" + '/robot_hp'),
+            ('robot8_hp',  '/' + "sample_robot_8" + '/robot_hp'),
         ],
     )
     
     hp_manager = Node(
         package='hp_manager',
-        name='manager_node',
+        name='hp_manager_node',
         executable='manager_node',
         namespace=ROBOT_NAME,
         remappings=[
@@ -235,10 +245,10 @@ def generate_launch_description():
             ('armor_topic_3', '/World/' + ROBOT_NAME + '/armor3_link/contact'),
             ('armor_topic_4', '/World/' + ROBOT_NAME + '/armor4_link/contact'),
         ],
-        parameters=[
-            ('initial_hp', '100'),
-            ('respawn_time_sec', '5.0'),
-        ],
+        parameters=[{
+            'initial_hp': 30,
+            'respawn_time_sec': 0.0,
+        }],
     )
 
     return LaunchDescription([
