@@ -24,7 +24,7 @@ def generate_launch_description():
         package="isaac_ros2_scripts",
         executable="launcher",
         parameters=[{'usd_path': str(core_stage_usd_path),
-                     'fps': 15.0,
+                     'fps': 5.0,
                      'time_steps_per_second': 120.0,
                      }],
     )

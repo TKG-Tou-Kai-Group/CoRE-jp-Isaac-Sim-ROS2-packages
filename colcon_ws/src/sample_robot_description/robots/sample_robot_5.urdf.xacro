@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<robot name="sample_robot_1" xmlns:xacro="http://ros.org/wiki/xacro">
+<robot name="sample_robot_5" xmlns:xacro="http://ros.org/wiki/xacro">
   <xacro:arg name="prefix" default="" />
   <xacro:arg name="use_sim" default="false" />
   
-  <xacro:arg name="robot_name" default="sample_robot_1"/>
+  <xacro:arg name="robot_name" default="sample_robot_5"/>
 
   <xacro:include filename="$(find sample_robot_description)/urdf/common.xacro"/>
   <xacro:include filename="$(find sample_robot_description)/urdf/base/base.urdf.xacro"/>

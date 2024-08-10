@@ -23,7 +23,7 @@ public:
     subscription_ = this->create_subscription<geometry_msgs::msg::Twist>(
       "cmd_vel", 10, std::bind(&MinimalPublisher::cmd_vel_callback, this, _1));
     timer_ = this->create_wall_timer(
-    500ms, std::bind(&MinimalPublisher::timer_callback, this));
+    100ms, std::bind(&MinimalPublisher::timer_callback, this));
   }
 
 private:
