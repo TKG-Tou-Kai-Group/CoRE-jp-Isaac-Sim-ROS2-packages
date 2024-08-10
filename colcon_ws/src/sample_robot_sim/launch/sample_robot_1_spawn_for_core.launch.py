@@ -30,18 +30,9 @@ def generate_launch_description():
     flying_disc_description_path = os.path.join(
         get_package_share_directory('flying_disc_description'))
 
-    flying_disc_xacro_file = os.path.join(flying_disc_description_path,
-                              'urdf',
-                              'flying_disc.urdf.xacro')
-    flying_disc_urdf_path = os.path.join(flying_disc_description_path, 'urdf', 'flying_disc.urdf')
-    # xacroをロード
-    flying_disc_doc = xacro.process_file(flying_disc_xacro_file, mappings={'use_sim' : 'true'})
-    # xacroを展開してURDFを生成
-    flying_disc_desc = flying_disc_doc.toprettyxml(indent='  ')
-    f = open(flying_disc_urdf_path, 'w')
-    f.write(flying_disc_desc)
-    f.close()
-    flying_disc_relative_urdf_path = pathlib.Path(flying_disc_urdf_path).relative_to(os.getcwd())
+    flying_disc_usd_file = os.path.join(flying_disc_description_path,
+                              'meshes', 'USD',
+                              'flying_disc_20set.usd')
 
 
     sample_robot_description_path = os.path.join(
@@ -100,45 +91,21 @@ def generate_launch_description():
         parameters=[{'urdf_path': str(sample_robot_relative_urdf_path)}],
     )
 
-    flying_disc_node_list = []
-    flying_disc_spawn_entity_list = []
-    for index in range(5):
-        node_name = 'spawn_disk_' + str(index)
-        flying_disc_node_list.append(
-            Node(
-                package="isaac_ros2_scripts",
-                executable="spawn_robot",
-                name= node_name,
-                parameters=[{'urdf_path': str(flying_disc_relative_urdf_path),
-                            'x' : ROBOT_START_POSITION[0],
-                            'y' : ROBOT_START_POSITION[1],
-                            'z' : ROBOT_START_POSITION[2] + 0.55 + 0.02 * index,
-                            'R' : 0.0,
-                            'P' : 0.0,
-                            'Y' : ROBOT_START_YAW,
-                            }],
+    flying_disc_spawn = Node(
+        package="isaac_ros2_scripts",
+        executable="add_usd",
+        name= "flying_disc_spawn",
+        parameters=[{'usd_path': str(flying_disc_usd_file),
+                    'usd_name' : ROBOT_NAME + "_flying_disc",
+                    'x' : ROBOT_START_POSITION[0],
+                    'y' : ROBOT_START_POSITION[1],
+                    'z' : ROBOT_START_POSITION[2] + 0.55,
+                    'R' : 0.0,
+                    'P' : 0.0,
+                    'Y' : ROBOT_START_YAW,
+                    }],
                 output='screen',
                 )
-        )
-        if index == 0:
-            flying_disc_spawn_entity_list.append(
-                RegisterEventHandler(
-                    event_handler=OnProcessExit(
-                        target_action=isaac_prepare_robot_controller,
-                        on_exit=[flying_disc_node_list[index]],
-                    )
-                )
-            )
-        else:
-            prev_index = index - 1
-            flying_disc_spawn_entity_list.append(
-                RegisterEventHandler(
-                    event_handler=OnProcessExit(
-                        target_action=flying_disc_node_list[prev_index],
-                        on_exit=[flying_disc_node_list[index]],
-                    )
-                )
-            )
 
     robot_controllers = PathJoinSubstitution(
         [
@@ -264,6 +231,12 @@ def generate_launch_description():
                 on_exit=[isaac_prepare_robot_controller],
             )
         ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=isaac_prepare_robot_controller,
+                on_exit=[flying_disc_spawn],
+            )
+        ),
         node_robot_state_publisher,
         isaac_spawn_robot,
         control_node,
@@ -275,5 +248,5 @@ def generate_launch_description():
         teleop_twist_joy,
         core_jp_camera_publisher,
         hp_manager,
-    ] + flying_disc_spawn_entity_list
+    ]
     )
