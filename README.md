@@ -1,6 +1,6 @@
 # CoREjp-Isaac-Sim-ROS2-packages
 - サンプルロボット操縦デモ
-  ![ros2_control_demo](figs/CoREjp_robot_test3.gif)
+  ![ros2_control_demo](figs/core_sim_multi_robot_test.gif)
 
 このリポジトリは，NvidiaのIsaac SimでROS 2で作ったロボットを開発するためのパッケージをまとめたものです．
 重要なパッケージは"isaac_ros2_utils"内に格納された"topic_based_ros2_control"と"isaac_ros2_scripts"です．
