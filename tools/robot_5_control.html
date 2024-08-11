@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<!-- <script src="https://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script> -->
+<!-- <script type="text/javascript" src="roslib.min.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/roslibjs/0.20.0/roslib.min.js"></script>
+</head>
+
+<body>
+  <canvas id="imageCanvas" style="width: 100%; height: 100%;"></canvas>
+  <hr/>
+
+  <p>Connection: <span id="status" style="font-weight: bold;">N/A</span></p>
+
+  <script>
+    // ロボット名を設定
+    const ROBOT_NAME = 'sample_robot_5'; // ここでロボット名を指定します
+    const SERVER_ADDRESS = 'localhost';
+    const SERVER_PORT = '9090';
+
+    // Create ros object to communicate over your Rosbridge connection
+    const ros = new ROSLIB.Ros({
+      url: `ws://${SERVER_ADDRESS}:${SERVER_PORT}`,
+      options: {
+        ros_domain_id: '89' // ROS_DOMAIN_IDを設定する
+      }
+    });
+
+    // When the Rosbridge server connects, fill the span with id "status" with "successful"
+    ros.on("connection", () => {
+      document.getElementById("status").innerHTML = "successful";
+
+      const canvas = document.getElementById('imageCanvas');
+      // 画像の実際のサイズを設定
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      canvas.width = width;
+      canvas.height = height;
+
+      console.log('Connected to ROSBridge WebSocket server.');
+    });
+
+    // When the Rosbridge server experiences an error, fill the "status" span with the returned error
+    ros.on('error', function(error) {
+      console.log('Error connecting to ROSBridge WebSocket server: ', error);
+    });
+
+    // When the Rosbridge server shuts down, fill the "status" span with "closed"
+    ros.on('close', function() {
+      console.log('Connection to ROSBridge WebSocket server closed.');
+    });
+
+    var image = new ROSLIB.Topic({
+      ros : ros,
+      name : `/World/${ROBOT_NAME}/camera_link/image_compressed`,
+      messageType : 'sensor_msgs/CompressedImage'
+    });
+
+    image.subscribe(function(message) {
+      const canvas = document.getElementById('imageCanvas');
+      const context = canvas.getContext('2d');
+      const img = new Image();
+      img.src = 'data:image/jpeg;base64,' + message.data;
+      img.onload = () => {
+        context.drawImage(img, 0, 0, canvas.width, canvas.height);
+      };
+    });
+    
+    // Joyメッセージをパブリッシュするためのトピックを作成
+    const joyTopic = new ROSLIB.Topic({
+      ros: ros,
+      name: `/${ROBOT_NAME}/joy`,
+      messageType: 'sensor_msgs/Joy'
+    });
+
+    // ゲームパッドの状態を更新し、ROSにパブリッシュ
+    function updateGamepadStatus() {
+      const gamepads = navigator.getGamepads();
+      for (let i = 0; i < gamepads.length; i++) {
+        const gp = gamepads[i];
+        if (gp) {
+          // スティックの値を修正
+          const axes = gp.axes.map(axis => Math.abs(axis) <= 0.3 ? 0 : axis);
+
+          // Joyメッセージを作成
+          const joyMessage = new ROSLIB.Message({
+            header: {
+              stamp: {
+                secs: Math.floor(Date.now() / 1000),
+                nsecs: (Date.now() % 1000) * 1000000
+              },
+              frame_id: ''
+            },
+            axes: axes,
+            buttons: gp.buttons.map(button => button.value)
+          });
+
+          // Joyメッセージをパブリッシュ
+          joyTopic.publish(joyMessage);
+        }
+      }
+      requestAnimationFrame(updateGamepadStatus);
+    }
+
+    window.addEventListener("gamepadconnected", (e) => {
+      updateGamepadStatus();
+    });
+</script>
+
+</body>
+</html>
+
