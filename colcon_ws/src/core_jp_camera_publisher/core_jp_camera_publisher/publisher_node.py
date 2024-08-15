@@ -104,7 +104,16 @@ class ImageOverlayPublisher(Node):
         output_image = self.draw_robot_status(output_image, "sample_robot7", 7, 10, int(height / 10) * 3 + 40)
         output_image = self.draw_robot_status(output_image, "sample_robot8", 8, int(width*5/6) - 10, int(height / 10) * 3 + 40)
         output_image = self.draw_result(output_image)
-        compressed_image_msg = self.bridge.cv2_to_compressed_imgmsg(output_image, dst_format='jpg')
+
+        # 圧縮率を指定してJPEGにエンコード
+        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 70]
+        _, buffer = cv2.imencode('.jpg', output_image, encode_param)
+
+        compressed_image_msg = CompressedImage()
+        compressed_image_msg.header = msg.header
+        compressed_image_msg.format = 'jpeg'
+        compressed_image_msg.data = np.array(buffer).tobytes()
+
         self.publisher.publish(compressed_image_msg)
 
     def status_callback(self, msg):

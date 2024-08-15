@@ -19,6 +19,12 @@
     const SERVER_ADDRESS = 'localhost';
     const SERVER_PORT = '9090';
 
+    // 仮想ゲームパッドの状態を保持するためのオブジェクト
+    let virtualGamepad = {
+      axes: [0, 0, 0, 0, 0, 0], // 左スティックと右スティックのX,Y
+      buttons: Array(18).fill(0) // 12ボタン分（任意の数）
+    };
+
     // Create ros object to communicate over your Rosbridge connection
     const ros = new ROSLIB.Ros({
       url: `ws://${SERVER_ADDRESS}:${SERVER_PORT}`,
@@ -77,6 +83,7 @@
     // ゲームパッドの状態を更新し、ROSにパブリッシュ
     function updateGamepadStatus() {
       const gamepads = navigator.getGamepads();
+
       for (let i = 0; i < gamepads.length; i++) {
         const gp = gamepads[i];
         if (gp) {
@@ -105,6 +112,98 @@
 
     window.addEventListener("gamepadconnected", (e) => {
       updateGamepadStatus();
+    });
+
+    // ゲームパッドの状態を更新し、ROSにパブリッシュ
+    function updateKeyBoardStatus() {
+      let axes = virtualGamepad.axes.slice(); // 仮想ゲームパッドの軸情報をコピー
+      let buttons = virtualGamepad.buttons.slice(); // 仮想ゲームパッドのボタン情報をコピー
+
+      // Joyメッセージを作成
+      const joyMessage = new ROSLIB.Message({
+        header: {
+          stamp: {
+            secs: Math.floor(Date.now() / 1000),
+            nsecs: (Date.now() % 1000) * 1000000
+          },
+          frame_id: ''
+        },
+        axes: axes,
+        buttons: buttons
+      });
+
+      // Joyメッセージをパブリッシュ
+      joyTopic.publish(joyMessage);
+    }
+
+    window.addEventListener('keydown', (event) => {
+      switch (event.key) {
+        case 'ArrowUp': // 上矢印キーで左スティックのY軸を上に動かす
+          virtualGamepad.axes[1] = -1;
+          virtualGamepad.buttons[5] = 1;
+          break;
+        case 'ArrowDown': // 下矢印キーで左スティックのY軸を下に動かす
+          virtualGamepad.axes[1] = 1;
+          virtualGamepad.buttons[5] = 1;
+          break;
+        case 'ArrowLeft': // 左矢印キーで左スティックのX軸を左に動かす
+          virtualGamepad.axes[0] = -1;
+          virtualGamepad.buttons[5] = 1;
+          break;
+        case 'ArrowRight': // 右矢印キーで左スティックのX軸を右に動かす
+          virtualGamepad.axes[0] = 1;
+          virtualGamepad.buttons[5] = 1;
+          break;
+        case 'w': // 'W'キーで右スティックのY軸を上に動かす
+          virtualGamepad.axes[3] = -1;
+          virtualGamepad.buttons[5] = 1;
+          break;
+        case 's': // 'S'キーで右スティックのY軸を下に動かす
+          virtualGamepad.axes[3] = 1;
+          virtualGamepad.buttons[5] = 1;
+          break;
+        case 'a': // 'A'キーで右スティックのX軸を左に動かす
+          virtualGamepad.axes[2] = -1;
+          virtualGamepad.buttons[5] = 1;
+          break;
+        case 'd': // 'D'キーで右スティックのX軸を右に動かす
+          virtualGamepad.axes[2] = 1;
+          virtualGamepad.buttons[5] = 1;
+          break;
+        case ' ': // スペースキーを仮想ボタン1として使用
+          virtualGamepad.buttons[1] = 1;
+          break;
+      }
+      updateKeyBoardStatus();
+    });
+
+    window.addEventListener('keyup', (event) => {
+      switch (event.key) {
+        case 'ArrowUp':
+        case 'ArrowDown':
+          virtualGamepad.axes[1] = 0;
+          virtualGamepad.buttons[5] = 0;
+          break;
+        case 'ArrowLeft':
+        case 'ArrowRight':
+          virtualGamepad.axes[0] = 0;
+          virtualGamepad.buttons[5] = 0;
+          break;
+        case 'w':
+        case 's':
+          virtualGamepad.axes[3] = 0;
+          virtualGamepad.buttons[5] = 0;
+          break;
+        case 'a':
+        case 'd':
+          virtualGamepad.axes[2] = 0;
+          virtualGamepad.buttons[5] = 0;
+          break;
+        case ' ':
+          virtualGamepad.buttons[1] = 0;
+          break;
+      }
+      updateKeyBoardStatus();
     });
 </script>
 

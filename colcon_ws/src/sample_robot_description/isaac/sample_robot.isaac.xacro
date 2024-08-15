@@ -13,8 +13,8 @@
         <focus_distance>400</focus_distance> <!-- distance for clear image -->
         <projection>perspective</projection> <!-- perspective or orthgonal -->
         <image>
-           <width>620</width>
-           <height>360</height>
+           <width>960</width>
+           <height>540</height>
         </image>
         <clip>
           <near>0.02</near>
