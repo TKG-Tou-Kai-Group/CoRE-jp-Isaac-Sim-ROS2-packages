@@ -222,6 +222,12 @@ def generate_launch_description():
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=isaac_spawn_robot,
+                on_exit=[flying_disc_spawn],
+            )
+        ),
+        RegisterEventHandler(
+            event_handler=OnProcessExit(
+                target_action=flying_disc_spawn,
                 on_exit=[isaac_prepare_sensors],
             )
         ),
@@ -229,12 +235,6 @@ def generate_launch_description():
             event_handler=OnProcessExit(
                 target_action=isaac_prepare_sensors,
                 on_exit=[isaac_prepare_robot_controller],
-            )
-        ),
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=isaac_prepare_robot_controller,
-                on_exit=[flying_disc_spawn],
             )
         ),
         node_robot_state_publisher,

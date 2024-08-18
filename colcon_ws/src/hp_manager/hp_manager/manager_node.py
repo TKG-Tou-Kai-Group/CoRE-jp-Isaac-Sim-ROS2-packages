@@ -43,7 +43,8 @@ class HPManager(Node):
                 self.hp -= 10
                 if self.hp <= 0:
                     self.hp = 0
-                    threading.Timer(self.respawn_time_sec, self.reset_hp).start()
+                    if self.respawn_time_sec > 0:
+                        threading.Timer(self.respawn_time_sec, self.reset_hp).start()
         self.old_bool_values[1] = msg.data
 
     def bool3_callback(self, msg):
@@ -52,7 +53,8 @@ class HPManager(Node):
                 self.hp -= 10
                 if self.hp <= 0:
                     self.hp = 0
-                    threading.Timer(self.respawn_time_sec, self.reset_hp).start()
+                    if self.respawn_time_sec > 0:
+                        threading.Timer(self.respawn_time_sec, self.reset_hp).start()
         self.old_bool_values[2] = msg.data
 
     def bool4_callback(self, msg):
@@ -61,7 +63,8 @@ class HPManager(Node):
                 self.hp -= 10
                 if self.hp <= 0:
                     self.hp = 0
-                    threading.Timer(self.respawn_time_sec, self.reset_hp).start()
+                    if self.respawn_time_sec > 0:
+                        threading.Timer(self.respawn_time_sec, self.reset_hp).start()
         self.old_bool_values[3] = msg.data
 
     def reset_hp(self):

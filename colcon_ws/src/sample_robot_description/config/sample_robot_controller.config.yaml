@@ -11,6 +11,6 @@
         yaw: 2
       scale_angular:
         yaw: -0.5
-      enable_button: 5
+      require_enable_button: false
       shoot_button: 1
       enable_turbo_button: 8

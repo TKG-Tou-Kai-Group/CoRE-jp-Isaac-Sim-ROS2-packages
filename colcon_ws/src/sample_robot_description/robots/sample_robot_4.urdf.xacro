@@ -15,7 +15,15 @@
 
   <!-- =============== Link & Joint =============== -->
   <!-- Base -->
-  <link name="base_link"/>
+  <link name="base_link">
+    <inertial>
+      <origin xyz="0 0 0"/>
+      <mass value="0.0001"/>
+      <inertia ixx="0.00001" ixy="0" ixz="0"
+                         iyy="0.00001" iyz="0"
+                                 izz="0.00001" />
+    </inertial>
+  </link>
   <xacro:base_v0 parent="base_link">
 	<origin xyz="0 0 0.06"/>
   </xacro:base_v0>
@@ -54,6 +62,13 @@
     <origin xyz="0.45 0 0.28" rpy="0 0 0"/>
   </joint>
   <link name="camera_link">
+    <inertial>
+      <origin xyz="0 0 0"/>
+      <mass value="0.0001"/>
+      <inertia ixx="0.00001" ixy="0" ixz="0"
+                         iyy="0.00001" iyz="0"
+                                 izz="0.00001" />
+    </inertial>
   </link>
 
   <joint name="armor1_joint" type="fixed">

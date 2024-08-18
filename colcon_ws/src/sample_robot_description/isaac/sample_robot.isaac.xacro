@@ -13,14 +13,14 @@
         <focus_distance>400</focus_distance> <!-- distance for clear image -->
         <projection>perspective</projection> <!-- perspective or orthgonal -->
         <image>
-           <width>960</width>
-           <height>540</height>
+           <width>640</width>
+           <height>360</height>
         </image>
         <clip>
           <near>0.02</near>
           <far>300</far>
         </clip>
-        <update_rate>10.0</update_rate>
+        <update_rate>5.0</update_rate>
       </sensor>
       <sensor name="armor1_link" type="contact">
         <topic>contact</topic>
