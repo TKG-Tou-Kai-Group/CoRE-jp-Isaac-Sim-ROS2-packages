@@ -52,6 +52,13 @@ RUN apt-get update && apt-get install -q -y --no-install-recommends \
     nodejs \
     && apt-get clean
 
+RUN apt-get update && apt-get install -q -y --no-install-recommends \
+    ros-humble-rmw-cyclonedds-cpp \
+    && apt-get clean
+
+#RUN echo 'export FASTRTPS_DEFAULT_PROFILES_FILE=/root/colcon_ws/src/isaac_ros2_utils/isaac_ros2_scripts/config/fastdds.xml' >> ~/.bashrc
+#RUN echo 'export RMW_IMPLEMENTATION=rmw_fastrtps_cpp' >> ~/.bashrc
+RUN echo 'export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp' >> ~/.bashrc
 RUN echo 'source /opt/ros/humble/setup.bash' >> ~/.bashrc
 RUN echo 'source /root/colcon_ws/install/setup.sh' >> ~/.bashrc
 
