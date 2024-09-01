@@ -19,8 +19,8 @@
       </hardware>
       <joint name="wheel0_shaft_joint">
         <command_interface name="velocity">
-          <param name="min">-6</param>
-          <param name="max">6</param>
+          <param name="min">-100</param>
+          <param name="max">100</param>
         </command_interface>
         <state_interface name="position">
           <param name="initial_value">0.0</param>
@@ -30,8 +30,8 @@
       </joint>
       <joint name="wheel1_shaft_joint">
         <command_interface name="velocity">
-          <param name="min">-6</param>
-          <param name="max">6</param>
+          <param name="min">-100</param>
+          <param name="max">100</param>
         </command_interface>
         <state_interface name="position">
           <param name="initial_value">0.0</param>
@@ -41,8 +41,8 @@
       </joint>
       <joint name="wheel2_shaft_joint">
         <command_interface name="velocity">
-          <param name="min">-6</param>
-          <param name="max">6</param>
+          <param name="min">-100</param>
+          <param name="max">100</param>
         </command_interface>
         <state_interface name="position">
           <param name="initial_value">0.0</param>
@@ -52,8 +52,8 @@
       </joint>
       <joint name="wheel3_shaft_joint">
         <command_interface name="velocity">
-          <param name="min">-6</param>
-          <param name="max">6</param>
+          <param name="min">-100</param>
+          <param name="max">100</param>
         </command_interface>
         <state_interface name="position">
           <param name="initial_value">0.0</param>

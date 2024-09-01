@@ -12,12 +12,17 @@
   <hr/>
 
   <p>Connection: <span id="status" style="font-weight: bold;">N/A</span></p>
+  <p>Current Speed Scale-factor: <span id="scale-factor">1.0</span></p>
+  <hr/>
 
   <script>
     // ロボット名を設定
     const ROBOT_NAME = 'sample_robot_6'; // ここでロボット名を指定します
     const SERVER_ADDRESS = 'localhost';
     const SERVER_PORT = '9090';
+    
+    let scaleFactor = 0.5; // 倍率の初期値を0.5に設定
+    let crossKeyPressed = false;
 
     // 仮想ゲームパッドの状態を保持するためのオブジェクト
     let virtualGamepad = {
@@ -87,8 +92,35 @@
       for (let i = 0; i < gamepads.length; i++) {
         const gp = gamepads[i];
         if (gp) {
+          // ボタンの値を取得
+          const buttons = gp.buttons.map(button => button.value)
+
+          // 十字キーの上下で倍率を調整
+          if (gp.buttons[12].pressed)  // 十字キー上 
+          {
+            if (crossKeyPressed == false)
+            {
+              scaleFactor += 0.05;
+              if (scaleFactor > 1) scaleFactor = 1; // 上限を1に設定
+              crossKeyPressed = true;
+            }
+          } 
+          else if (gp.buttons[13].pressed) // 十字キー下
+          {
+            if (crossKeyPressed == false)
+            {
+              scaleFactor -= 0.05;
+              if (scaleFactor < 0.05) scaleFactor = 0.05; // 下限を0.05に設定
+              crossKeyPressed = true;
+            }
+          } 
+          else
+          {
+            crossKeyPressed = false;
+          }
+
           // スティックの値を修正
-          const axes = gp.axes.map(axis => Math.abs(axis) <= 0.3 ? 0 : axis);
+          const axes = gp.axes.map(axis => Math.abs(axis) <= 0.3 ? 0 : axis * scaleFactor);
 
           // Joyメッセージを作成
           const joyMessage = new ROSLIB.Message({
@@ -105,6 +137,9 @@
 
           // Joyメッセージをパブリッシュ
           joyTopic.publish(joyMessage);
+          
+          // 現在の倍率を表示
+          document.getElementById('scale-factor').textContent = (scaleFactor * 2).toFixed(1);
         }
       }
       requestAnimationFrame(updateGamepadStatus);

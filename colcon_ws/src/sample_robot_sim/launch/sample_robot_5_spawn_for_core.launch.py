@@ -187,6 +187,7 @@ def generate_launch_description():
         namespace=ROBOT_NAME,
         remappings=[
             ('input_image_topic', '/World/' + ROBOT_NAME + '/camera_link/image_raw'),
+            ('top_view_image_topic', '/World/' + ROBOT_NAME + '/top_view_camera_link/image_raw'),
             ('output_image_topic',  '/World/' + ROBOT_NAME + '/camera_link/image_compressed'),
             ('game_status', '/game_status'),
             ('countdown', '/countdown'),

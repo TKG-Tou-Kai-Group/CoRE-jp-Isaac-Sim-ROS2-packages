@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image, CompressedImage
+from sensor_msgs.msg import Joy
 from std_msgs.msg import Int32
 import cv2
 import numpy as np
@@ -24,6 +25,16 @@ class ImageOverlayPublisher(Node):
             Image,
             'input_image_topic',
             self.image_callback,
+            10)
+        self.top_view_subscription = self.create_subscription(
+            Image,
+            'top_view_image_topic',
+            self.top_view_image_callback,
+            10)
+        self.joy_subscription = self.create_subscription(
+            Joy,
+            'joy',
+            self.joy_callback,
             10)
         self.status_subscription = self.create_subscription(
             Int32,
@@ -81,6 +92,9 @@ class ImageOverlayPublisher(Node):
         package_share_directory = get_package_share_directory('core_jp_camera_publisher')
         overlay_image_path = os.path.join(package_share_directory, 'data', 'Reticle.png')
         self.overlay = cv2.imread(overlay_image_path, cv2.IMREAD_UNCHANGED)  # 透過PNGを読み込む
+
+        self.top_view_image = None
+        self.button4_pressed = False
         
         self.game_status = STATUS_NORMAL
         self.game_time = 0
@@ -92,6 +106,12 @@ class ImageOverlayPublisher(Node):
         
         # 画像の高さと幅を取得
         height, width, _ = cv_image.shape
+
+        if self.button4_pressed and self.top_view_image is not None:
+            # top_view_imageを左下に小さく表示
+            output_image = self.overlay_top_view(cv_image, self.top_view_image)
+        else:
+            output_image = cv_image
 
         output_image = self.overlay_image(cv_image, self.overlay)
         output_image = self.draw_countdown(output_image)
@@ -115,6 +135,32 @@ class ImageOverlayPublisher(Node):
         compressed_image_msg.data = np.array(buffer).tobytes()
 
         self.publisher.publish(compressed_image_msg)
+
+    def overlay_top_view(self, background, overlay):
+        # overlay画像のサイズを縮小
+        scale_factor = 1.0
+        overlay = cv2.resize(overlay, (0, 0), fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_AREA)
+        
+        overlay_height, overlay_width = overlay.shape[:2]
+        bg_height, bg_width = background.shape[:2]
+
+        # 左下に配置する位置を計算
+        x1 = 10
+        y1 = bg_height - overlay_height - 10
+        x2 = x1 + overlay_width
+        y2 = y1 + overlay_height
+
+        # 合成
+        background[y1:y2, x1:x2] = overlay
+
+        return background
+
+    def top_view_image_callback(self, msg):
+        self.top_view_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+
+    def joy_callback(self, joy_msg):
+        # ボタン4の状態を更新
+        self.button4_pressed = joy_msg.buttons[4] == 1
 
     def status_callback(self, msg):
         self.game_status = msg.data

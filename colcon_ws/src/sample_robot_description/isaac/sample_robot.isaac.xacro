@@ -20,8 +20,27 @@
           <near>0.02</near>
           <far>300</far>
         </clip>
-        <update_rate>5.0</update_rate>
+        <update_rate>10.0</update_rate>
       </sensor>
+
+      <sensor name="top_view_camera_link" type="camera">
+        <topic>image_raw</topic>
+        <horizontal_fov_rad>0.523599</horizontal_fov_rad>
+        <horizontal_focal_length>30</horizontal_focal_length> <!-- optical parameter -->
+        <vertical_focal_length>30</vertical_focal_length> <!-- optical parameter -->
+        <focus_distance>10</focus_distance> <!-- distance for clear image -->
+        <projection>perspective</projection> <!-- perspective or orthgonal -->
+        <image>
+           <width>180</width>
+           <height>180</height>
+        </image>
+        <clip>
+          <near>5.0</near>
+          <far>15</far>
+        </clip>
+        <update_rate>10.0</update_rate>
+      </sensor>
+
       <sensor name="armor1_link" type="contact">
         <topic>contact</topic>
       </sensor>

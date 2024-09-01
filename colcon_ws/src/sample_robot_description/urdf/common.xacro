@@ -22,11 +22,37 @@
     <isaac_rigid_body static_friction="1.0" dynamic_friction="1.0"/>
   </material>
   <material name="light_red">
-    <color rgba="1.0 0.5 0.5 1.0"/>
+    <color rgba="1.0 0.5 0.5 0.6"/>
+    <isaac_rigid_body static_friction="1.0" dynamic_friction="1.0"/>
+  </material>
+  <material name="orange">
+    <color rgba="1.0 0.5 0.0 1.0"/>
     <isaac_rigid_body static_friction="1.0" dynamic_friction="1.0"/>
   </material>
   <material name="yellow">
-    <color rgba="0 1.0 1.0 1.0"/>
+    <color rgba="1.0 1.0 0.0 1.0"/>
     <isaac_rigid_body static_friction="1.0" dynamic_friction="1.0"/>
   </material>
+  <material name="yellow_green">
+    <color rgba="0.5 1.0 0.0 1.0"/>
+    <isaac_rigid_body static_friction="1.0" dynamic_friction="1.0"/>
+  </material>
+
+  <material name="blue">
+    <color rgba="0.0 0.0 1.0 1.0"/>
+    <isaac_rigid_body static_friction="1.0" dynamic_friction="1.0"/>
+  </material>
+  <material name="light_blue">
+    <color rgba="0.5 0.5 1.0 0.6"/>
+    <isaac_rigid_body static_friction="1.0" dynamic_friction="1.0"/>
+  </material>
+  <material name="purple">
+    <color rgba="1.0 0.0 1.0 1.0"/>
+    <isaac_rigid_body static_friction="1.0" dynamic_friction="1.0"/>
+  </material>
+  <material name="blue_green">
+    <color rgba="0.0 1.0 0.5 1.0"/>
+    <isaac_rigid_body static_friction="1.0" dynamic_friction="1.0"/>
+  </material>
+
 </robot>
