@@ -24,12 +24,12 @@
 
 1. このリポジトリをクローンする
    ```bash
-   git clone https://github.com/hijimasa/isaac-ros2-control-sample.git
+   git clone https://github.com/TKG-Tou-Kai-Group/CoRE-jp-Isaac-Sim-ROS2-packages.git
    ```
 
 1. サブモジュール（オムニホイールコントローラ）をセットアップする
    ```bash
-   cd isaac-ros2-control-sample/docker
+   cd CoRE-jp-Isaac-Sim-ROS2-packages/docker
    git submodule update --init --recursive
    ```
 
