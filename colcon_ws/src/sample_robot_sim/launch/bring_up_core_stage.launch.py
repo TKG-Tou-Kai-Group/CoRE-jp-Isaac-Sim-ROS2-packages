@@ -25,7 +25,7 @@ def generate_launch_description():
         executable="launcher",
         parameters=[{'usd_path': str(core_stage_usd_path),
                      'fps': 10.0,
-                     'time_steps_per_second': 120.0,
+                     'time_steps_per_second': 60.0,
                      }],
     )
     
