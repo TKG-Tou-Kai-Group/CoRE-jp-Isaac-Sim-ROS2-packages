@@ -23,7 +23,7 @@ class HPManager(Node):
         self.old_bool_values = [False, False, False, False]
 
         # Subscriber for reset command
-        self.reset_subscriber = self.create_subscription(Bool, 'reset_hp', self.reset_callback, 10)
+        self.reset_subscriber = self.create_subscription(Bool, '/reset_hp', self.reset_callback, 10)
 
         self.publish_hp_timer = self.create_timer(1.0, self.publish_hp)
 

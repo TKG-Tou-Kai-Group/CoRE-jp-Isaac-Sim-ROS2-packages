@@ -68,10 +68,10 @@ namespace teleop_twist_joy_for_sample_robot
     bool inverted_reverse;
 
     std::map<std::string, int64_t> axis_linear_map;
-    std::map<std::string, std::map<std::string, double> > scale_linear_map;
+    std::map<std::string, std::map<std::string, double>> scale_linear_map;
 
     std::map<std::string, int64_t> axis_angular_map;
-    std::map<std::string, std::map<std::string, double> > scale_angular_map;
+    std::map<std::string, std::map<std::string, double>> scale_angular_map;
 
     bool sent_disable_msg;
   };

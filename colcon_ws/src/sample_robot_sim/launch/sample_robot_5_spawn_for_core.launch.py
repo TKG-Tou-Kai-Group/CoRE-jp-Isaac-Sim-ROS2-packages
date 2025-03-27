@@ -20,7 +20,7 @@ import launch
 import xacro
 
 ROBOT_NAME = 'sample_robot_5'
-ROBOT_START_POSITION    = [-6.5, 8.5, 0.0]
+ROBOT_START_POSITION    = [-11.25, 4.5, 0.1]
 ROBOT_START_YAW = 0.0
 
 def generate_launch_description():

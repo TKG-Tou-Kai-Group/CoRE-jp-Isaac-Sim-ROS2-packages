@@ -10,6 +10,7 @@ from ament_index_python.packages import get_package_share_directory
 import os
 from PIL import Image as PILImage, ImageDraw, ImageFont
 
+STATUS_DRAW =       -1
 STATUS_NORMAL =     0
 STATUS_RED_WIN =    1
 STATUS_BLUE_WIN =   2
@@ -270,6 +271,8 @@ class ImageOverlayPublisher(Node):
                 self.text_to_draw = "BLUE WIN"
             elif self.game_status >= STATUS_ROBOT1_WIN:
                 self.text_to_draw = "ROBOT" + str(self.game_status - STATUS_ROBOT1_WIN + 1) + " WIN"
+            elif self.game_status == STATUS_DRAW:
+                self.text_to_draw = "DRAW"
 
             # OpenCV画像をPillow画像に変換
             cv_image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)

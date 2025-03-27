@@ -20,7 +20,7 @@ import launch
 import xacro
 
 ROBOT_NAME = 'sample_robot_1'
-ROBOT_START_POSITION    = [-4.5, 8.5, 0.0]
+ROBOT_START_POSITION    = [-9.75, 4.5, 0.15]
 ROBOT_START_YAW = 0.0
 
 def generate_launch_description():
@@ -214,7 +214,7 @@ def generate_launch_description():
             ('armor_topic_4', '/World/' + ROBOT_NAME + '/armor4_link/contact'),
         ],
         parameters=[{
-            'initial_hp': 30,
+            'initial_hp': 200,
             'respawn_time_sec': 0.0,
         }],
     )

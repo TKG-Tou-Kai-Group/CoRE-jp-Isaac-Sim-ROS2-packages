@@ -5,12 +5,12 @@
         x: 1
         y: 0
       scale_linear:
-        x: -1.2
-        y: -1.2
+        x: -1.8
+        y: -1.8
       axis_angular:
         yaw: 2
       scale_angular:
-        yaw: -1.5
+        yaw: -3.0
       require_enable_button: false
-      shoot_button: 1
+      shoot_button: 5
       enable_turbo_button: 8
