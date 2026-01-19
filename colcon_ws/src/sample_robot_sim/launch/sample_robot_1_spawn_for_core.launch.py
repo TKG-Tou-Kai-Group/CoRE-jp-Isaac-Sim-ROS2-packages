@@ -220,10 +220,10 @@ def generate_launch_description():
         executable='manager_node',
         namespace=ROBOT_NAME,
         remappings=[
-            ('armor_topic_1', '/World/' + ROBOT_NAME + '/armor1_link/contact'),
-            ('armor_topic_2', '/World/' + ROBOT_NAME + '/armor2_link/contact'),
-            ('armor_topic_3', '/World/' + ROBOT_NAME + '/armor3_link/contact'),
-            ('armor_topic_4', '/World/' + ROBOT_NAME + '/armor4_link/contact'),
+            ('armor_topic_1', '/' + ROBOT_NAME + '/base_link/armor1_link/contact'),
+            ('armor_topic_2', '/' + ROBOT_NAME + '/base_link/armor2_link/contact'),
+            ('armor_topic_3', '/' + ROBOT_NAME + '/base_link/armor3_link/contact'),
+            ('armor_topic_4', '/' + ROBOT_NAME + '/base_link/armor4_link/contact'),
         ],
         parameters=[{
             'initial_hp': 200,
