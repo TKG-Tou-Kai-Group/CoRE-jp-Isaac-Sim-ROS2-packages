@@ -4,9 +4,6 @@ from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.substitutions import LaunchConfiguration
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import AnyLaunchDescriptionSource
-from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     # Launch Arguments
@@ -45,14 +42,18 @@ def generate_launch_description():
             ('robot8_hp', '/sample_robot_8/robot_hp'),
         ],
     )
-    rosbridge_launch = IncludeLaunchDescription(
-        AnyLaunchDescriptionSource([
-            FindPackageShare('rosbridge_server'), '/launch/rosbridge_websocket_launch.xml'
-        ])
+    # rosbridge_websocket node with explicit parameter types for Jazzy compatibility
+    rosbridge_websocket = Node(
+        package='rosbridge_server',
+        executable='rosbridge_websocket',
+        name='rosbridge_websocket',
+        parameters=[{
+            'delay_between_messages': 0.0,  # Must be float, not int
+        }],
     )
 
     return LaunchDescription([
         isaac_launcher,
         game_manager,
-        rosbridge_launch,
+        rosbridge_websocket,
     ])

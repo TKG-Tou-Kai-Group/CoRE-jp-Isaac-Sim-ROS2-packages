@@ -6,7 +6,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/image.hpp"
 #include "std_msgs/msg/float32_multi_array.hpp"
-#include "cv_bridge/cv_bridge.h"
+#include "cv_bridge/cv_bridge.hpp"
 #include "opencv2/highgui/highgui.hpp"
 
 #define OUTPUT_IMAGE_WIDTH 1920

@@ -23,6 +23,23 @@ ROBOT_NAME = 'sample_robot_6'
 ROBOT_START_POSITION    = [11.25, -4.5, 0.1]
 ROBOT_START_YAW = 3.14
 
+def wrap_yaml_text(input_path: str, robot_name: str, output_path: str) -> None:
+    # 元ファイルを行単位で読み込み
+    with open(input_path, 'r') as fin:
+        lines = fin.readlines()
+
+    # 出力先を書き込みモードで開く
+    with open(output_path, 'w') as fout:
+        # 先頭にロボット名
+        fout.write(f"{robot_name}:\n")
+        # 元ファイルの各行を先頭２スペースでインデント
+        for line in lines:
+            # 空行はそのまま
+            if line.strip() == "":
+                fout.write("\n")
+            else:
+                fout.write(f"  {line}")
+
 def generate_launch_description():
     # Launch Arguments
     use_sim_time = LaunchConfiguration('use_sim_time', default=True)
@@ -77,20 +94,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    isaac_prepare_sensors = Node(
-        package="isaac_ros2_scripts",
-        executable="prepare_sensors",
-        namespace=ROBOT_NAME,
-        parameters=[{'urdf_path': str(sample_robot_relative_urdf_path)}],
-    )
-
-    isaac_prepare_robot_controller = Node(
-        package="isaac_ros2_scripts",
-        executable="prepare_robot_controller",
-        namespace=ROBOT_NAME,
-        parameters=[{'urdf_path': str(sample_robot_relative_urdf_path)}],
-    )
-
     flying_disc_spawn = Node(
         package="isaac_ros2_scripts",
         executable="add_usd",
@@ -107,18 +110,24 @@ def generate_launch_description():
                 output='screen',
                 )
 
-    robot_controllers = PathJoinSubstitution(
-        [
-            FindPackageShare("sample_robot_description"),
-            "config",
-            "sample_robot_config.yaml",
-        ]
+    robot_description_path = os.path.join(
+        get_package_share_directory('sample_robot_description'),
+        'config',
+        'sample_robot_config.yaml'
     )
+    tmp_robot_controllers_path = os.path.join(
+        '/tmp',
+        f'{ROBOT_NAME}_sim.yaml'
+    )
+    wrap_yaml_text(robot_description_path, ROBOT_NAME, tmp_robot_controllers_path)
+
+    robot_controllers = tmp_robot_controllers_path
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
         namespace=ROBOT_NAME,
         parameters=[params, robot_controllers],
+        ros_arguments=[],
         output={
             "stdout": "screen",
             "stderr": "screen",
@@ -129,18 +138,21 @@ def generate_launch_description():
         package="controller_manager",
         executable="spawner",
         arguments=["joint_state_broadcaster", "--controller-manager", "/" + ROBOT_NAME + "/controller_manager"],
+        ros_arguments=[],
     )
     
     omni_wheel_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=["omni_wheel_controller", "--controller-manager", "/" + ROBOT_NAME + "/controller_manager"],
+        ros_arguments=[],
     )
 
     velocity_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
         arguments=["velocity_controller", "--controller-manager", "/" + ROBOT_NAME + "/controller_manager"],
+        ros_arguments=[],
     )
 
     velocity_converter = Node(
@@ -186,9 +198,9 @@ def generate_launch_description():
         executable='publisher_node',
         namespace=ROBOT_NAME,
         remappings=[
-            ('input_image_topic', '/World/' + ROBOT_NAME + '/camera_link/image_raw'),
-            ('top_view_image_topic', '/World/' + ROBOT_NAME + '/top_view_camera_link/image_raw'),
-            ('output_image_topic',  '/World/' + ROBOT_NAME + '/camera_link/image_compressed'),
+            ('input_image_topic', '/' + ROBOT_NAME + '/base_link/camera_link/image_raw'),
+            ('top_view_image_topic', '/' + ROBOT_NAME + '/base_link/top_view_camera_link/image_raw'),
+            ('output_image_topic',  '/' + ROBOT_NAME + '/base_link/camera_link/image_compressed'),
             ('game_status', '/game_status'),
             ('countdown', '/countdown'),
             ('robot1_hp',  '/' + "sample_robot_1" + '/robot_hp'),
@@ -224,18 +236,6 @@ def generate_launch_description():
             event_handler=OnProcessExit(
                 target_action=isaac_spawn_robot,
                 on_exit=[flying_disc_spawn],
-            )
-        ),
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=flying_disc_spawn,
-                on_exit=[isaac_prepare_sensors],
-            )
-        ),
-        RegisterEventHandler(
-            event_handler=OnProcessExit(
-                target_action=isaac_prepare_sensors,
-                on_exit=[isaac_prepare_robot_controller],
             )
         ),
         node_robot_state_publisher,

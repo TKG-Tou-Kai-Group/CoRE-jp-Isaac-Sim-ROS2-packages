@@ -148,14 +148,14 @@ class GameManager(Node):
 
     def joy1_callback(self, msg):
         # ボタン8と9が同時に押されたらリセット
-        if msg.buttons[8] == True and msg.buttons[9] == True:
+        if msg.buttons[9] == True:
             self.joy_status[0] = 1
         else:
             self.joy_status[0] = 0
 
     def joy2_callback(self, msg):
         # ボタン8と9が同時に押されたらリセット
-        if msg.buttons[8] == True and msg.buttons[9] == True:
+        if msg.buttons[9] == True:
             self.joy_status[1] = 1
         else:
             self.joy_status[1] = 0

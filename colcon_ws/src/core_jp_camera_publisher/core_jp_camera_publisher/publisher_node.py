@@ -253,7 +253,8 @@ class ImageOverlayPublisher(Node):
             font = ImageFont.truetype(font_path, font_size)
 
             # テキストの描画位置を計算
-            text_width, text_height = draw.textsize(str(-self.game_time), font=font)
+            bbox = draw.textbbox((0, 0), str(-self.game_time), font=font)
+            text_width, text_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
             text_x = (width - text_width) // 2
             text_y = (height - text_height) // 2
 
@@ -289,7 +290,8 @@ class ImageOverlayPublisher(Node):
             font = ImageFont.truetype(font_path, font_size)
 
             # テキストの描画位置を計算
-            text_width, text_height = draw.textsize(self.text_to_draw, font=font)
+            bbox = draw.textbbox((0, 0), self.text_to_draw, font=font)
+            text_width, text_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
             text_x = (width - text_width) // 2
             text_y = (height - text_height) // 2
 
@@ -325,7 +327,8 @@ class ImageOverlayPublisher(Node):
         font = ImageFont.truetype(font_path, font_size)
 
         # テキストの描画位置を計算
-        text_width, text_height = draw.textsize(self.text_to_draw, font=font)
+        bbox = draw.textbbox((0, 0), self.text_to_draw, font=font)
+        text_width, text_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
         text_x = (width - text_width) // 2
         text_y = (height - text_height) // 20
 
@@ -370,7 +373,8 @@ class ImageOverlayPublisher(Node):
         font = ImageFont.truetype(font_path, font_size)
 
         # テキストの描画位置を計算
-        text_width, text_height = draw.textsize(robot_name, font=font)
+        bbox = draw.textbbox((0, 0), robot_name, font=font)
+        text_width, text_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
         text_x = top_left_corner[0] + (rect_width - text_width) // 2
         text_y = top_left_corner[1] + int(rect_height * 0.2)
 
