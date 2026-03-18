@@ -15,7 +15,7 @@ def generate_launch_description():
 
     core_stage_usd_path = os.path.join(core_stage_description_path,
                               'meshes', 'USD',
-                              'core_2025_stage.usd')
+                              'core_stage.usd')
 
     isaac_launcher = Node(
         package="isaac_ros2_scripts",

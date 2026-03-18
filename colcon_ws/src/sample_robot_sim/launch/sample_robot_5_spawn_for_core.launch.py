@@ -20,8 +20,8 @@ import launch
 import xacro
 
 ROBOT_NAME = 'sample_robot_5'
-ROBOT_START_POSITION    = [-11.25, 4.5, 0.1]
-ROBOT_START_YAW = 0.0
+ROBOT_START_POSITION    = [-4.5, -11.25, 0.1]
+ROBOT_START_YAW = 1.57
 
 def wrap_yaml_text(input_path: str, robot_name: str, output_path: str) -> None:
     # 元ファイルを行単位で読み込み
