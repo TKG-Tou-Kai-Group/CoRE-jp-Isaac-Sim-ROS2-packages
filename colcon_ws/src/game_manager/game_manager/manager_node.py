@@ -106,7 +106,17 @@ class GameManager(Node):
             self.remaining_time -= 1
         elif self.show_result_time >= 0: # 勝敗決定
             self.show_result_time -= 1
-            if self.game_kind == GAME_INDIVIDUAL_MATICH:
+            if self.game_kind == GAME_TEAM_MATCH:
+                # チーム戦: 奇数番(1,3,5,7)=Blue、偶数番(2,4,6,8)=Red
+                blue_hp = sum(self.robot_hp[i] for i in range(0, 8, 2))  # index 0,2,4,6
+                red_hp = sum(self.robot_hp[i] for i in range(1, 8, 2))   # index 1,3,5,7
+                if blue_hp > red_hp:
+                    self.game_status = STATUS_BLUE_WIN
+                elif red_hp > blue_hp:
+                    self.game_status = STATUS_RED_WIN
+                else:
+                    self.game_status = STATUS_DRAW
+            elif self.game_kind == GAME_INDIVIDUAL_MATICH:
                 # 最大HPを持つロボットが複数いる場合は引き分け
                 if self.robot_hp.count(max(self.robot_hp)) > 1:
                     self.game_status = STATUS_DRAW

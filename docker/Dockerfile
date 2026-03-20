@@ -45,7 +45,8 @@ RUN apt -y -qq update && apt -y -qq install software-properties-common mesa-util
     ros-jazzy-cv-bridge ros-jazzy-diagnostic-updater \
     ros-jazzy-moveit && \
   apt-get install -y -qq ros-jazzy-xacro ros-jazzy-realtime-tools ros-jazzy-control-toolbox ros-jazzy-ros2-control* ros-jazzy-ros-testing \
-    ros-jazzy-teleop-twist-keyboard ros-jazzy-vision-msgs ros-jazzy-rosbridge-suite && \
+    ros-jazzy-teleop-twist-keyboard ros-jazzy-vision-msgs ros-jazzy-rosbridge-suite \
+    ros-jazzy-web-video-server && \
   : "remove cache" && \
   apt-get autoremove -y -qq && \
   rm -rf /var/lib/apt/lists/*

@@ -96,52 +96,85 @@ class ImageOverlayPublisher(Node):
 
         self.top_view_image = None
         self.button4_pressed = False
-        
+
         self.game_status = STATUS_NORMAL
         self.game_time = 0
         self.robot_hp = [0,0,0,0,0,0,0,0]
         self.max_robot_hp = [0,0,0,0,0,0,0,0]
 
+        self.declare_parameter('jpeg_quality', 50)
+
+        # フォントをキャッシュ（毎フレームのディスクI/Oを回避）
+        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+        self._font_cache = {}
+        self._font_path = font_path
+
+    def _get_font(self, size):
+        """フォントをキャッシュから取得（サイズ別）"""
+        if size not in self._font_cache:
+            self._font_cache[size] = ImageFont.truetype(self._font_path, size)
+        return self._font_cache[size]
+
     def image_callback(self, msg):
         cv_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
-        
+
         # 画像の高さと幅を取得
         height, width, _ = cv_image.shape
 
         if self.button4_pressed and self.top_view_image is not None:
             # top_view_imageを左下に小さく表示
-            output_image = self.overlay_top_view(cv_image, self.top_view_image)
-        else:
-            output_image = cv_image
+            cv_image = self.overlay_top_view(cv_image, self.top_view_image)
 
+        # レティクルオーバーレイ（OpenCVで処理）
         output_image = self.overlay_image(cv_image, self.overlay)
-        output_image = self.draw_countdown(output_image)
-        output_image = self.draw_robot_status(output_image, "sample_robot1", 1, 10, 10)
-        output_image = self.draw_robot_status(output_image, "sample_robot2", 2, int(width*5/6) - 10, 10)
-        output_image = self.draw_robot_status(output_image, "sample_robot3", 3, 10, int(height / 10) + 20)
-        output_image = self.draw_robot_status(output_image, "sample_robot4", 4, int(width*5/6) - 10, int(height / 10) + 20)
-        output_image = self.draw_robot_status(output_image, "sample_robot5", 5, 10, int(height / 10) * 2 + 30)
-        output_image = self.draw_robot_status(output_image, "sample_robot6", 6, int(width*5/6) - 10, int(height / 10) * 2 + 30)
-        output_image = self.draw_robot_status(output_image, "sample_robot7", 7, 10, int(height / 10) * 3 + 40)
-        output_image = self.draw_robot_status(output_image, "sample_robot8", 8, int(width*5/6) - 10, int(height / 10) * 3 + 40)
-        output_image = self.draw_result(output_image)
 
-        # 圧縮率を指定してJPEGにエンコード
-        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 70]
+        # PIL変換を1回だけ行い、全テキスト描画をまとめて実行
+        cv_image_rgb = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
+        pil_image = PILImage.fromarray(cv_image_rgb)
+        draw = ImageDraw.Draw(pil_image)
+
+        # カウントダウン描画
+        self._draw_countdown_on_pil(draw, width, height)
+
+        # ロボットステータス描画（720p対応: UIスケール0.75 = 元解像度の1.5倍）
+        ui_s = 0.75
+        rw = int(width / 6 * ui_s)   # パネル幅
+        rh = int(height / 10 * ui_s)  # パネル高さ
+        gap = int(10 * ui_s)          # パネル間の隙間
+        rx = width - rw - 10          # 右側パネルのX座標
+        for i, (name, idx) in enumerate([
+            ("sample_robot1", 1), ("sample_robot2", 2),
+            ("sample_robot3", 3), ("sample_robot4", 4),
+            ("sample_robot5", 5), ("sample_robot6", 6),
+            ("sample_robot7", 7), ("sample_robot8", 8),
+        ]):
+            row = i // 2
+            x = 10 if i % 2 == 0 else rx
+            y = 10 + row * (rh + gap)
+            self._draw_robot_status_on_pil(draw, name, idx, x, y, width, height, ui_s)
+
+        # 試合結果描画
+        self._draw_result_on_pil(draw, width, height)
+
+        # PIL→OpenCVに1回だけ変換
+        output_image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+
+        # JPEG圧縮してCompressedImageとしてパブリッシュ
+        jpeg_quality = self.get_parameter('jpeg_quality').get_parameter_value().integer_value
+        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), jpeg_quality]
         _, buffer = cv2.imencode('.jpg', output_image, encode_param)
 
         compressed_image_msg = CompressedImage()
         compressed_image_msg.header = msg.header
         compressed_image_msg.format = 'jpeg'
         compressed_image_msg.data = np.array(buffer).tobytes()
-
         self.publisher.publish(compressed_image_msg)
 
     def overlay_top_view(self, background, overlay):
-        # overlay画像のサイズを縮小
-        scale_factor = 1.0
+        # 720p対応: 俯瞰画像を2倍に拡大
+        scale_factor = 2.0
         overlay = cv2.resize(overlay, (0, 0), fx=scale_factor, fy=scale_factor, interpolation=cv2.INTER_AREA)
-        
+
         overlay_height, overlay_width = overlay.shape[:2]
         bg_height, bg_width = background.shape[:2]
 
@@ -236,164 +269,87 @@ class ImageOverlayPublisher(Node):
 
         return background
 
-    def draw_result(self, image):
+    def _draw_result_on_pil(self, draw, width, height):
+        """試合結果テキストをPIL DrawオブジェクトにDirectに描画"""
         if self.game_time < 0:
-            # OpenCV画像をPillow画像に変換
-            cv_image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            pil_image = PILImage.fromarray(cv_image_rgb)
-
-            # 画像の高さと幅を取得
-            width, height = pil_image.size
-            
-            draw = ImageDraw.Draw(pil_image)
-
-            # フォントの設定
-            font_size = int(height // 8)
-            font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-            font = ImageFont.truetype(font_path, font_size)
-
-            # テキストの描画位置を計算
-            bbox = draw.textbbox((0, 0), str(-self.game_time), font=font)
+            text = str(-self.game_time)
+            font = self._get_font(int(height // 8))
+            bbox = draw.textbbox((0, 0), text, font=font)
             text_width, text_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
             text_x = (width - text_width) // 2
             text_y = (height - text_height) // 2
-
-            # 四角形内にテキストを描画
-            draw.text((text_x, text_y), str(-self.game_time), font=font, fill=(255, 255, 255))
-
-            # Pillow画像をOpenCV画像に戻す
-            cv_image = np.array(pil_image)
-            image = cv2.cvtColor(cv_image, cv2.COLOR_RGB2BGR)
-        
-        elif not self.game_status == 0:
+            draw.text((text_x, text_y), text, font=font, fill=(255, 255, 255))
+        elif self.game_status != STATUS_NORMAL:
             if self.game_status == STATUS_RED_WIN:
-                self.text_to_draw = "RED WIN"
+                text = "RED WIN"
             elif self.game_status == STATUS_BLUE_WIN:
-                self.text_to_draw = "BLUE WIN"
+                text = "BLUE WIN"
             elif self.game_status >= STATUS_ROBOT1_WIN:
-                self.text_to_draw = "ROBOT" + str(self.game_status - STATUS_ROBOT1_WIN + 1) + " WIN"
+                text = "ROBOT" + str(self.game_status - STATUS_ROBOT1_WIN + 1) + " WIN"
             elif self.game_status == STATUS_DRAW:
-                self.text_to_draw = "DRAW"
+                text = "DRAW"
+            else:
+                return
 
-            # OpenCV画像をPillow画像に変換
-            cv_image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            pil_image = PILImage.fromarray(cv_image_rgb)
-            
-            draw = ImageDraw.Draw(pil_image)
-
-            # 画像の高さと幅を取得
-            width, height = pil_image.size
-
-            # フォントの設定
-            font_size = int(height // 8)
-            font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-            font = ImageFont.truetype(font_path, font_size)
-
-            # テキストの描画位置を計算
-            bbox = draw.textbbox((0, 0), self.text_to_draw, font=font)
+            font = self._get_font(int(height // 8))
+            bbox = draw.textbbox((0, 0), text, font=font)
             text_width, text_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
             text_x = (width - text_width) // 2
             text_y = (height - text_height) // 2
+            draw.text((text_x, text_y), text, font=font, fill=(255, 255, 255))
 
-            # 四角形内にテキストを描画
-            draw.text((text_x, text_y), self.text_to_draw, font=font, fill=(255, 255, 255))
-
-            # Pillow画像をOpenCV画像に戻す
-            cv_image = np.array(pil_image)
-            image = cv2.cvtColor(cv_image, cv2.COLOR_RGB2BGR)
-            
-        return image
-
-    def draw_countdown(self, image):
+    def _draw_countdown_on_pil(self, draw, width, height, ui_scale=1.0):
+        """カウントダウンをPIL Drawオブジェクトに直接描画"""
         if self.game_time < 0:
             draw_time = 0
         else:
             draw_time = self.game_time
-            
-        self.text_to_draw = str(int(draw_time // 60)).zfill(2) + " : " + str(int(draw_time % 60)).zfill(2)
 
-        # OpenCV画像をPillow画像に変換
-        cv_image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        pil_image = PILImage.fromarray(cv_image_rgb)
-        
-        draw = ImageDraw.Draw(pil_image)
+        text = str(int(draw_time // 60)).zfill(2) + " : " + str(int(draw_time % 60)).zfill(2)
 
-        # 画像の高さと幅を取得
-        width, height = pil_image.size
-
-        # フォントの設定
-        font_size = int(height // 20)
-        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-        font = ImageFont.truetype(font_path, font_size)
-
-        # テキストの描画位置を計算
-        bbox = draw.textbbox((0, 0), self.text_to_draw, font=font)
+        font = self._get_font(int(height // 20 * ui_scale))
+        bbox = draw.textbbox((0, 0), text, font=font)
         text_width, text_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
         text_x = (width - text_width) // 2
         text_y = (height - text_height) // 20
 
-        # 四角形内にテキストを描画
-        draw.text((text_x, text_y), self.text_to_draw, font=font, fill=(255, 255, 255))
+        draw.text((text_x, text_y), text, font=font, fill=(255, 255, 255))
 
-        # Pillow画像をOpenCV画像に戻す
-        cv_image = np.array(pil_image)
-        image = cv2.cvtColor(cv_image, cv2.COLOR_RGB2BGR)
-
-        return image
-
-    def draw_robot_status(self, image, robot_name, robot_index, position_x, position_y):
+    def _draw_robot_status_on_pil(self, draw, robot_name, robot_index, position_x, position_y, width, height, ui_scale=1.25):
+        """ロボットステータスをPIL Drawオブジェクトに直接描画"""
         if self.max_robot_hp[robot_index - 1] == 0:
-            return image
-            
+            return
+
         if self.robot_hp[robot_index - 1] == 0:
             background_color = (32, 32, 32)
         else:
             background_color = (128, 128, 128)
 
-        # OpenCV画像をPillow画像に変換
-        cv_image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        pil_image = PILImage.fromarray(cv_image_rgb)
-
-        # 画像の高さと幅を取得
-        width, height = pil_image.size
-
         # 四角形の描画位置とサイズを計算
-        rect_width = int(width / 6)  # 画像幅の1/6
-        rect_height = int(height / 10)  # 画像高さの1/10
+        rect_width = int(width / 6 * ui_scale)
+        rect_height = int(height / 10 * ui_scale)
         top_left_corner = (position_x, position_y)
         bottom_right_corner = (top_left_corner[0] + rect_width, top_left_corner[1] + rect_height)
 
-        # 四角形とテキストを描画
-        draw = ImageDraw.Draw(pil_image)
         draw.rectangle([top_left_corner, bottom_right_corner], fill=background_color)
 
-        # フォントの設定
-        font_size = int(rect_height * 0.2)
-        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-        font = ImageFont.truetype(font_path, font_size)
-
-        # テキストの描画位置を計算
+        font = self._get_font(int(rect_height * 0.2))
         bbox = draw.textbbox((0, 0), robot_name, font=font)
         text_width, text_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
         text_x = top_left_corner[0] + (rect_width - text_width) // 2
         text_y = top_left_corner[1] + int(rect_height * 0.2)
-
-        # 四角形内にテキストを描画
         draw.text((text_x, text_y), robot_name, font=font, fill=(255, 255, 255))
 
+        # HPバー背景
         top_left_corner = (position_x + int(rect_width * 0.1), position_y + int(rect_height * 0.6))
         bottom_right_corner = (top_left_corner[0] + int(rect_width * 0.8), top_left_corner[1] + int(rect_height*0.2))
         draw.rectangle([top_left_corner, bottom_right_corner], fill=(0,0,0))
 
+        # HPバー
         top_left_corner = (position_x + int(rect_width * 0.1), position_y + int(rect_height * 0.6))
         bottom_right_corner = (top_left_corner[0] + int(rect_width * 0.8 * self.robot_hp[robot_index - 1] / self.max_robot_hp[robot_index - 1]), top_left_corner[1] + int(rect_height*0.2))
         draw.rectangle([top_left_corner, bottom_right_corner], fill=(0,255,128))
 
-        # Pillow画像をOpenCV画像に戻す
-        cv_image = np.array(pil_image)
-        image = cv2.cvtColor(cv_image, cv2.COLOR_RGB2BGR)
-
-        return image
 
 def main(args=None):
     rclpy.init(args=args)
@@ -408,4 +364,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-
